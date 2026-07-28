@@ -10,11 +10,52 @@ HERMES enables communities in remote or disaster-affected areas to exchange mess
 
 ## Documentation Index
 
+### Core Specifications
+
 | Document | Description |
 |----------|-------------|
-| [REST API](api.md) | Complete HTTP API reference — authentication, radio management, conversations, messaging, geolocation, system management, WebSocket gateway, and security |
-| [Database Schema](database.md) | Full normalized SQLite schema — entity relationships, table definitions, indexes, migrations, retention policies, power-loss strategy, and Drizzle ORM TypeScript mapping |
-| [Architecture Audit](architecture-audit-sbitx-v2.md) | Adversarial architecture audit for sBitx v2 — critical risks, power-loss analysis, memory budget, and hardware feasibility assessment |
+| [REST API](docs/api.md) | Complete HTTP API reference — authentication, radio management, conversations, messaging, geolocation, system management, WebSocket gateway, and security |
+| [Database Schema](docs/database.md) | Full normalized SQLite schema — entity relationships, table definitions, indexes, migrations, retention policies, power-loss strategy, and Drizzle ORM TypeScript mapping |
+| [Architecture Audit](docs/architecture-audit-sbitx-v2.md) | Adversarial architecture audit for sBitx v2 — critical risks, power-loss analysis, memory budget, and hardware feasibility assessment |
+| [WebSocket Protocol](docs/websocket.md) | Realtime gateway protocol — subprotocol `hermes-v1`, message frames, topic subscriptions, sync protocol, heartbeat, connection limits |
+| [Hardware Integration](docs/hardware-integration.md) | sBitx CLI command reference, HAL driver contract (`IRadioDriver`), simulated vs real driver behavior, SWR protection |
+
+### Architecture Decision Records
+
+| Document | Decision |
+|----------|----------|
+| [ADR-001](docs/adr/adr-001-sqlite-for-pi4.md) | SQLite (WAL mode) as primary database for Pi 4 |
+| [ADR-002](docs/adr/adr-002-in-process-event-bus.md) | In-process EventEmitter over Redis Pub/Sub |
+| [ADR-003](docs/adr/adr-003-conversation-messaging-model.md) | Conversation-based messaging over inbox/outbox |
+| [ADR-004](docs/adr/adr-004-jwt-rs256-token-rotation.md) | JWT RS256 with refresh token rotation and reuse detection |
+
+### Development & Operations
+
+| Document | Description |
+|----------|-------------|
+| [Development Plan](docs/tasks/plan.md) | 10-phase development roadmap with 90+ tasks across ~18 weeks |
+| [Development Guide](docs/development.md) | Local dev setup, project structure, available scripts, debugging |
+| [Contributing](CONTRIBUTING.md) | PR process, commit conventions, branch strategy, testing requirements |
+| [Testing Strategy](docs/testing-strategy.md) | Testing pyramid (unit → integration → E2E), mock strategy, coverage targets |
+| [CI/CD Strategy](docs/ci-cd.md) | GitHub Actions workflows, deploy to Pi 4, Docker strategy, quality gates |
+| [Security Model](docs/security.md) | Threat model, auth (JWT RS256 + RBAC), rate limiting, input validation, audit logging |
+| [Deployment Guide](docs/deployment.md) | Pi 4 installation, systemd service, SD card optimization, backup/restore |
+| [Observability Guide](docs/observability.md) | Logging (Pino), metrics (Prometheus, opt-in), health checks, field debugging |
+
+### Project Files
+
+| File | Description |
+|------|-------------|
+| [LICENSE](LICENSE) | GNU General Public License v3.0 |
+| [CHANGELOG](CHANGELOG.md) | Version history and release notes |
+| [.env.example](.env.example) | Environment variable template with defaults and descriptions |
+| [.gitignore](.gitignore) | Standard Node.js gitignore patterns |
+
+### ⚠️ Deprecated
+
+| Document | Status |
+|----------|--------|
+| [Legacy REST API Fragment](docs/rest_api.md) | Superseded by [`docs/api.md`](docs/api.md); references removed PostgreSQL/Redis components |
 
 ---
 
