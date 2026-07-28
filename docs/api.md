@@ -25,6 +25,45 @@ Built with **Fastify v5**, the API focuses on performance, schema validation, an
 
 ---
 
+### Internationalization
+
+All API error responses are localized based on the user's language preference. The API supports three languages: English (`en`), Spanish (`es`), and Portuguese Brazil (`pt-BR`).
+
+**Locale resolution order:**
+
+1. User preference (`users.locale` in database, cached in JWT `locale` claim)
+2. `Accept-Language` HTTP header (e.g., `es-MX, es;q=0.9, en;q=0.8`)
+3. Fallback: `en`
+
+**Usage:**
+
+```http
+GET /api/v1/conversations HTTP/1.1
+Authorization: Bearer eyJhbGciOiJSUzI1NiIs...
+Accept-Language: es-MX, es;q=0.9
+```
+
+**Localized error response (RFC 7807):**
+
+```json
+{
+  "type": "https://hermes.example.com/errors/forbidden",
+  "title": "Forbidden",
+  "status": 403,
+  "code": "FORBIDDEN",
+  "message": "No tiene permisos suficientes para esta operación.",
+  "requestId": "req-uuid"
+}
+```
+
+> **Note**: The `title` field stays in English (RFC 7807 convention). The `code` field is a machine-readable identifier (never translated). Only `message` and `details[].message` are localized.
+
+**Changing language**: Users update their preference via `PATCH /users/me` with `{ "locale": "es" }`. This invalidates existing JWT tokens (old tokens carry the old locale) — the client must re-authenticate.
+
+See [docs/i18n.md](i18n.md) for the full internationalization strategy.
+
+---
+
 ## 2. Architecture & Design Principles
 
 ### Technology Stack
@@ -53,6 +92,39 @@ Built with **Fastify v5**, the API focuses on performance, schema validation, an
 | Redis 7 (Pub/Sub, BullMQ, sessions) | In-process EventEmitter + in-memory queues + SQLite sessions |
 | mediasoup SFU + coturn | Gated behind `ENABLE_WEBRTC=false` config flag (default off on Pi 4) |
 | OpenTelemetry tracing | Disabled by default; can be enabled for debugging |
+
+### Component Replacement Rationale
+
+**Database**: SQLite (WAL mode) was chosen over PostgreSQL for single-station sBitx v2 deployments. PostgreSQL's 300–800 MB RAM footprint and daemon process are incompatible with the Pi 4's 4 GB budget. The `DatabaseAdapter` interface allows migration to PostgreSQL for larger multi-station server deployments (Phase 4 federation) — Drizzle ORM's adapter pattern makes this a configuration switch, not a code rewrite.
+
+**Event Bus**: An in-process EventEmitter replaces Redis Pub/Sub. In a single Node.js process, there is no cross-process fan-out to manage. If the EventEmitter were unavailable (should never happen in normal operation — it's in the same process), the system falls back to direct service calls. This is a non-issue for a modular monolith.
+
+**Job Queues**: In-memory priority queue with SQLite backing store (`jobs` table) replaces BullMQ/Redis. Jobs survive process restarts via the backing store.
+
+**Session Store**: SQLite `user_sessions` table replaces Redis. Token hashes are stored directly in the database; no external cache dependency.
+
+**Rate Limiting**: In-memory counters replace Redis counters. Counters reset on a process restart — an acceptable tradeoff for single-station deployments. The rate limiter interface supports swapping to Redis or database-backed counters for multi-station deployments.
+
+**WebRTC / Audio Streaming**: mediasoup SFU (200–400 MB RAM) and coturn are removed. On sBitx v2, the radio itself is the audio channel. Peer-to-peer WebRTC signaling is gated behind `ENABLE_WEBRTC=false` (default off). Browser audio for LAN testing is a future consideration (browser capture → WebSocket → ALSA playback, no SFU needed).
+
+### Runtime Decision
+
+Node.js 22 LTS with TypeScript was chosen over Go and Python because:
+
+- Shared language with the Web UI frontend
+- Faster development velocity
+- Strong Fastify v5 ecosystem with first-class TypeScript support
+- Single-process concurrency via the event loop — no multi-process overhead on Pi 4
+- `--max-old-space-size=384` keeps V8 heap within memory budget
+
+### Radio Daemon Integration
+
+The API must remain fully compatible with the upstream Radio Daemon:
+
+- [hermes-radio-daemon](https://github.com/Rhizomatica/hermes-radio-daemon) — Radio control, state, metrics, PTT, TX/RX state, WebSocket event consumption
+- [hermes-api](https://github.com/Rhizomatica/hermes-api) — Legacy API compatibility reference
+
+**Source of truth**: The Radio Daemon provides runtime state via WebSocket; the API persists desired configuration in the `radio_profiles` table. On startup, the API reconciles database state with daemon state. When the daemon is unreachable, the API serves last-known state from the database with `radio.connected: false`.
 
 ### Design Decisions
 
@@ -1071,6 +1143,68 @@ Enforced limits to protect the Raspberry Pi 4's 4 GB RAM:
 | Sync catch-up threshold | 500 missed events → send `SYNC_SUMMARY` | Sync engine |
 | WebSocket connections | 10 concurrent | Gateway |
 | In-memory job queue depth | 1000 jobs | Job queue |
+| V8 heap | 384 MB (`--max-old-space-size=384`) | Node.js flag |
+| **Total estimated memory** | **~450–620 MB** | Well within 4 GB budget |
+
+---
+
+## 12. Design Decisions & Resolved Questions
+
+During the architecture redesign for sBitx v2, the following design questions were evaluated and resolved:
+
+### Messaging Model
+
+| Model | Characteristics |
+|-------|----------------|
+| Delta Chat | Email as transport, conversations, offline-first, asynchronous |
+| Traditional Chat | Real-time, WebSocket, radio synchronization |
+| Hybrid | Chat UX, store-and-forward messaging, email-like metadata, offline synchronization |
+
+**Decision**: **Hybrid model** — conversation-based UX with store-and-forward transport. The same message model works for real-time WebSocket delivery and delayed radio delivery. The `message_envelopes` abstraction handles email/SMTP interop without polluting the chat model.
+
+### Conversation Ownership
+
+| Model | Structure |
+|-------|-----------|
+| Station | `Station → Conversation` |
+| User | `User → Conversation` |
+| Both | `Station → Users → Conversations` |
+
+**Decision**: **User-owned conversations within a station context.** Users are members of conversations; conversations exist within the station database. Multi-user support within a single station is first-class.
+
+### Local Chat
+
+Should users connected to the same station be able to exchange messages without transmitting over HF?
+
+**Decision**: **Yes.** Local-only conversations use `channel=websocket` delivery. Mixed local + radio conversations are supported — delivery records are created per-channel and the system attempts all available channels.
+
+### Radio Configuration Source of Truth
+
+Should the Radio Daemon remain the source of truth, or should the configuration also be persisted in the database?
+
+**Decision**: **Daemon provides runtime state via WebSocket; API persists desired configuration in `radio_profiles` table.** On startup, the API reconciles database state with daemon state. When the daemon is unreachable, the API serves last-known state from the database with `radio.connected: false`.
+
+### Broadcast Messaging Behavior
+
+**Decision**: **One-to-many `broadcast` conversations with recipient station lists.** Recipients cannot reply (broadcast is one-directional). Maximum 200 recipients per broadcast conversation.
+
+---
+
+## 13. Future Considerations & Roadmap
+
+Items under consideration for future phases:
+
+- **Multi-process scaling**: Swap in-process EventEmitter to Redis Pub/Sub; in-memory queues to BullMQ/Redis for multi-station server deployments
+- **CQRS**: Command Query Responsibility Segregation for messaging at scale
+- **Offline synchronization**: Richer conflict resolution and merge strategies
+- **Plugin architecture**: Hot-pluggable application modules
+- **Multi-radio support**: Multiple transceivers per station
+- **Multi-tenant stations**: Multiple independent station contexts on one deployment
+- **Federation**: Station-to-station federation (Phase 4 — PostgreSQL + Redis may be reintroduced)
+- **GraphQL gateway**: Alternative query interface for complex data fetching
+- **Full API versioning strategy**: `/api/v2/` and deprecation policies
+- **Delta Chat integration**: Bridging conversation model with email transport for broader interoperability
+- **LAN audio streaming**: Browser audio capture → WebSocket → ALSA playback (no SFU needed)
 
 ---
 
