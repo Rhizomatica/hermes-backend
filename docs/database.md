@@ -354,6 +354,8 @@ CREATE TABLE users (
                     CHECK (status IN ('active', 'suspended', 'pending')),
     avatar_path     TEXT,
     metadata        TEXT NOT NULL DEFAULT '{}',     -- JSON stored as TEXT
+    locale          TEXT NOT NULL DEFAULT 'en'      -- User's preferred language (ISO 639-1)
+                    CHECK (locale IN ('en', 'es', 'pt-BR')),
     created_at      TEXT NOT NULL,                  -- ISO 8601 UTC
     updated_at      TEXT NOT NULL,                  -- ISO 8601 UTC
     last_seen_at    TEXT                             -- ISO 8601 UTC
@@ -681,6 +683,7 @@ CREATE TABLE message_envelopes (
     external_message_id TEXT,                       -- Message-ID from email header
     status              TEXT NOT NULL DEFAULT 'pending'
                         CHECK (status IN ('pending', 'processing', 'sent', 'received', 'failed')),
+    locale              TEXT NOT NULL DEFAULT 'en', -- Recipient's language for email templates
     created_at          TEXT NOT NULL,              -- ISO 8601 UTC
     processed_at        TEXT                        -- ISO 8601 UTC
 );
@@ -974,6 +977,7 @@ CREATE TABLE audit_logs (
     ip_address      TEXT,                           -- Stored as string
     user_agent      TEXT,
     metadata        TEXT NOT NULL DEFAULT '{}',     -- JSON stored as TEXT
+    locale          TEXT NOT NULL DEFAULT 'en',     -- Actor's locale at time of action (for i18n audit descriptions)
     created_at      TEXT NOT NULL                   -- ISO 8601 UTC
 );
 
