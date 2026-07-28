@@ -1,4 +1,4 @@
-# Adversarial Architecture Audit — Hermes Webservice on sBitx v2
+# Adversarial Architecture Audit — Hermes Backend on sBitx v2
 
 **Reviewer**: Architecture Auditor 🔍  
 **Date**: 2026-07-17  

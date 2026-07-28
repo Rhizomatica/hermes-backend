@@ -1,4 +1,4 @@
-# Deployment Guide — Hermes Webservice on sBitx v2 (Raspberry Pi 4)
+# Deployment Guide — Hermes Backend on sBitx v2 (Raspberry Pi 4)
 
 ## Target Hardware
 
@@ -33,12 +33,12 @@ sqlite3 --version # Should be ≥ 3.45
 
 ```bash
 # 1. Create application directory
-sudo mkdir -p /opt/hermes-webservice
-sudo chown pi:pi /opt/hermes-webservice
+sudo mkdir -p /opt/hermes-backend
+sudo chown pi:pi /opt/hermes-backend
 
 # 2. Clone repository
-cd /opt/hermes-webservice
-git clone https://github.com/Rhizomatica/hermes-webservice.git .
+cd /opt/hermes-backend
+git clone https://github.com/Rhizomatica/hermes-backend.git .
 
 # 3. Install dependencies
 npm ci --omit=dev
@@ -71,25 +71,25 @@ npm start
 
 ## Systemd Service
 
-Create `/etc/systemd/system/hermes-webservice.service`:
+Create `/etc/systemd/system/hermes-backend.service`:
 
 ```ini
 [Unit]
-Description=Hermes Webservice
-Documentation=https://github.com/Rhizomatica/hermes-webservice
+Description=Hermes Backend
+Documentation=https://github.com/Rhizomatica/hermes-backend
 After=network.target
 
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/opt/hermes-webservice
+WorkingDirectory=/opt/hermes-backend
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/node --max-old-space-size=384 /opt/hermes-webservice/dist/server.js
+ExecStart=/usr/bin/node --max-old-space-size=384 /opt/hermes-backend/dist/server.js
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=hermes-webservice
+SyslogIdentifier=hermes-backend
 
 # Memory limits
 MemoryMax=500M
@@ -100,8 +100,8 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=yes
-ReadWritePaths=/opt/hermes-webservice/data /opt/hermes-webservice/logs /tmp
-ReadOnlyPaths=/opt/hermes-webservice
+ReadWritePaths=/opt/hermes-backend/data /opt/hermes-backend/logs /tmp
+ReadOnlyPaths=/opt/hermes-backend
 
 [Install]
 WantedBy=multi-user.target
@@ -111,12 +111,12 @@ Enable and start:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable hermes-webservice
-sudo systemctl start hermes-webservice
-sudo systemctl status hermes-webservice
+sudo systemctl enable hermes-backend
+sudo systemctl start hermes-backend
+sudo systemctl status hermes-backend
 
 # View logs
-sudo journalctl -u hermes-webservice -f
+sudo journalctl -u hermes-backend -f
 ```
 
 ## SD Card Optimization
@@ -175,23 +175,23 @@ curl -k -X POST https://localhost:3000/setup \
 
 ```bash
 # Backup (while server is running)
-sqlite3 /opt/hermes-webservice/data/hermes.sqlite ".backup /mnt/backup/hermes-$(date +%Y%m%d).sqlite"
+sqlite3 /opt/hermes-backend/data/hermes.sqlite ".backup /mnt/backup/hermes-$(date +%Y%m%d).sqlite"
 
 # Restore
-sudo systemctl stop hermes-webservice
-cp /mnt/backup/hermes-YYYYMMDD.sqlite /opt/hermes-webservice/data/hermes.sqlite
-sudo systemctl start hermes-webservice
+sudo systemctl stop hermes-backend
+cp /mnt/backup/hermes-YYYYMMDD.sqlite /opt/hermes-backend/data/hermes.sqlite
+sudo systemctl start hermes-backend
 ```
 
 ## Upgrades
 
 ```bash
-cd /opt/hermes-webservice
+cd /opt/hermes-backend
 git pull
 npm ci --omit=dev
 npm run build
 npm run db:migrate
-sudo systemctl restart hermes-webservice
+sudo systemctl restart hermes-backend
 ```
 
 ## Power-Loss Preparation
@@ -207,10 +207,10 @@ sudo systemctl restart hermes-webservice
 ps aux | grep node
 
 # Database size
-ls -lh /opt/hermes-webservice/data/hermes.sqlite*
+ls -lh /opt/hermes-backend/data/hermes.sqlite*
 
 # Logs (structured JSON via journald)
-sudo journalctl -u hermes-webservice --since "1 hour ago" -o json
+sudo journalctl -u hermes-backend --since "1 hour ago" -o json
 
 # Metrics (if METRICS_ENABLED=true)
 curl http://localhost:9090/metrics

@@ -1,8 +1,8 @@
-# Observability Guide — Hermes Webservice
+# Observability Guide — Hermes Backend
 
 ## Overview
 
-The Hermes Webservice implements a **lightweight observability stack** optimized for Raspberry Pi 4 field deployments. By default, only structured logging is active. Metrics and tracing are opt-in to conserve limited RAM.
+The Hermes Backend implements a **lightweight observability stack** optimized for Raspberry Pi 4 field deployments. By default, only structured logging is active. Metrics and tracing are opt-in to conserve limited RAM.
 
 | Pillar | Technology | Default | Pi 4 Overhead |
 |--------|-----------|:---:|:---:|
@@ -282,8 +282,8 @@ Prometheus TSDB retention is not configured (metrics are disabled by default on 
 
 Since field stations are often air-gapped:
 
-1. **Log export**: `sudo journalctl -u hermes-webservice --since "24h ago" -o json > logs.json`
-2. **Database inspection**: `sqlite3 /opt/hermes-webservice/data/hermes.sqlite`
+1. **Log export**: `sudo journalctl -u hermes-backend --since "24h ago" -o json > logs.json`
+2. **Database inspection**: `sqlite3 /opt/hermes-backend/data/hermes.sqlite`
 3. **Health snapshot**: `curl -k https://localhost:3000/health/deep`
 4. **Memory snapshot**: `ps aux | grep node`
 5. **Config dump**: `GET /system/config` (admin-only endpoint)

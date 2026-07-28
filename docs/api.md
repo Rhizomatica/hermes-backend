@@ -1,6 +1,6 @@
 # HERMES REST API
 
-**Project**: hermes-webservice  
+**Project**: hermes-backend  
 **Status**: Architecture Design — Adapted for sBitx v2 (Raspberry Pi 4)  
 **Based on**: [hermes-backend](https://github.com/Rhizomatica/hermes-backend) architecture
 

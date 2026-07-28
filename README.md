@@ -1,8 +1,8 @@
-# Hermes Webservice
+# Hermes Backend
 
 **API & Database Documentation**
 
-This repository contains the comprehensive API and database documentation for the HERMES webservice — the next-generation backend for [HERMES](https://www.rhizomatica.org/hermes/) communication stations. The documentation is derived from the [hermes-backend](https://github.com/Rhizomatica/hermes-backend) architecture design, **adapted for single-station sBitx v2 deployments on Raspberry Pi 4 (4 GB RAM) in field conditions**.
+This repository contains the comprehensive API and database documentation for the HERMES backend — the next-generation backend for [HERMES](https://www.rhizomatica.org/hermes/) communication stations. The documentation is derived from the [hermes-backend](https://github.com/Rhizomatica/hermes-backend) architecture design, **adapted for single-station sBitx v2 deployments on Raspberry Pi 4 (4 GB RAM) in field conditions**.
 
 HERMES enables communities in remote or disaster-affected areas to exchange messages, files, audio, and GPS coordinates over HF radio (3–30 MHz shortwave), where no internet, cell towers, or satellites are available.
 
@@ -98,7 +98,7 @@ HERMES enables communities in remote or disaster-affected areas to exchange mess
 └────────────┬──────────────────────┬──────────────────┐
              │ HTTPS REST           │ WSS              │
 ┌────────────▼──────────────────────▼──────────────────┘────────────────┐
-│                        hermes-webservice (single Node.js process)      │
+│                        hermes-backend (single Node.js process)      │
 │  ┌──────────────────┐  ┌──────────────────┐                           │
 │  │   REST API       │  │  WebSocket       │                           │
 │  │   (Fastify)      │  │  Gateway         │                           │
@@ -172,7 +172,7 @@ The system is designed for unreliable field conditions:
 ## Project Structure
 
 ```
-hermes-webservice/
+hermes-backend/
 ├── src/
 │   ├── api/                    # Fastify HTTP routes, controllers, middleware
 │   │   ├── v1/
@@ -255,4 +255,4 @@ GNU General Public License v3.0
 
 ---
 
-> HERMES is a project by [Rhizomatica](https://www.rhizomatica.org/hermes/) enabling communities in remote or disaster-affected areas to communicate when infrastructure fails.# hermes-webservice
+> HERMES is a project by [Rhizomatica](https://www.rhizomatica.org/hermes/) enabling communities in remote or disaster-affected areas to communicate when infrastructure fails.# hermes-backend

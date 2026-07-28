@@ -6,7 +6,7 @@
 
 ## Context
 
-The Hermes Webservice authenticates users (radio operators, station managers, administrators) who access the system from a browser UI, mobile device, or CLI tool. The authentication mechanism must:
+The Hermes Backend authenticates users (radio operators, station managers, administrators) who access the system from a browser UI, mobile device, or CLI tool. The authentication mechanism must:
 
 - Work **offline** (no third-party OAuth providers — the station may be air-gapped)
 - Support **token expiration** (15-minute access tokens, 7-day refresh tokens)
@@ -158,7 +158,7 @@ CREATE INDEX idx_sessions_expires ON user_sessions(expires_at);
   "station": "sbitx-v2-001",
   "iat": 1722000000,
   "exp": 1722000900,
-  "iss": "hermes-webservice"
+  "iss": "hermes-backend"
 }
 ```
 

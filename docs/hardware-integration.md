@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Hermes Webservice communicates with the **sBitx v2** HF transceiver through a Hardware Abstraction Layer (HAL). All hardware commands go through the `IRadioDriver` interface, which has two implementations:
+The Hermes Backend communicates with the **sBitx v2** HF transceiver through a Hardware Abstraction Layer (HAL). All hardware commands go through the `IRadioDriver` interface, which has two implementations:
 
 | Driver | Purpose | Requires Hardware |
 |--------|---------|:---:|

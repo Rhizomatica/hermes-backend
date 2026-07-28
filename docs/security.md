@@ -1,8 +1,8 @@
-# Security Model — Hermes Webservice
+# Security Model — Hermes Backend
 
 ## Threat Model
 
-The Hermes Webservice operates in **field conditions** — remote locations with unreliable infrastructure. The threat model considers:
+The Hermes Backend operates in **field conditions** — remote locations with unreliable infrastructure. The threat model considers:
 
 | Threat Actor | Capability | Motivation |
 |-------------|------------|------------|
@@ -13,7 +13,7 @@ The Hermes Webservice operates in **field conditions** — remote locations with
 
 ### What We Don't Protect Against
 
-- **HF radio eavesdropping**: HF is a shared medium. Encryption at the transport layer is out of scope for the webservice. Future work: application-layer E2E encryption (Signal Protocol) for sensitive messages.
+- **HF radio eavesdropping**: HF is a shared medium. Encryption at the transport layer is out of scope for the backend. Future work: application-layer E2E encryption (Signal Protocol) for sensitive messages.
 - **Physical tampering with sBitx hardware**: The Pi 4 SD card can be removed and read. Future work: full-disk encryption (LUKS) on the SD card.
 - **Side-channel attacks**: Power analysis, timing attacks on the Pi 4 are out of scope for a field-deployed humanitarian communication tool.
 
@@ -194,7 +194,7 @@ Audit logs are **immutable, append-only**. No deletions. Retention: 2 years (con
 
 - Generated on first run if `JWT_PRIVATE_KEY_PATH` doesn't exist
 - Stored as PEM files at configured paths
-- Private key: `chmod 600`, owned by the hermes-webservice process user
+- Private key: `chmod 600`, owned by the hermes-backend process user
 - Public key: readable by the process, can be distributed for federation
 
 ### TLS Certificates

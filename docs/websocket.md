@@ -1,4 +1,4 @@
-# WebSocket Realtime Gateway — Hermes Webservice
+# WebSocket Realtime Gateway — Hermes Backend
 
 ## Overview
 

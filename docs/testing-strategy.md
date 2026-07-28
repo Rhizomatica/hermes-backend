@@ -1,4 +1,4 @@
-# Testing Strategy — Hermes Webservice
+# Testing Strategy — Hermes Backend
 
 ## Philosophy
 

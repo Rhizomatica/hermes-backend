@@ -1,8 +1,8 @@
-# CI/CD Strategy — Hermes Webservice
+# CI/CD Strategy — Hermes Backend
 
 ## Overview
 
-The CI/CD pipeline automates linting, testing, building, and deployment for the Hermes Webservice. The pipeline runs on **GitHub Actions** and targets two distinct deployment environments:
+The CI/CD pipeline automates linting, testing, building, and deployment for the Hermes Backend. The pipeline runs on **GitHub Actions** and targets two distinct deployment environments:
 
 | Environment | Target | Trigger |
 |-------------|--------|---------|
@@ -156,7 +156,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.PI4_HOST }}
           REMOTE_USER: ${{ secrets.PI4_USER }}
-          TARGET: /opt/hermes-webservice/
+          TARGET: /opt/hermes-backend/
           EXCLUDE: |
             node_modules/
             .git/
@@ -172,11 +172,11 @@ jobs:
           username: ${{ secrets.PI4_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /opt/hermes-webservice
+            cd /opt/hermes-backend
             npm ci --omit=dev
             npm run db:migrate
-            sudo systemctl restart hermes-webservice
-            sudo systemctl status hermes-webservice
+            sudo systemctl restart hermes-backend
+            sudo systemctl status hermes-backend
 ```
 
 ### 3. Nightly Security Scan (`.github/workflows/security-scan.yml`)

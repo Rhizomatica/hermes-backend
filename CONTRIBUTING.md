@@ -1,4 +1,4 @@
-# Contributing to Hermes Webservice
+# Contributing to Hermes Backend
 
 Thank you for your interest in contributing to Hermes. This document outlines the process for contributing code, documentation, and bug reports.
 
@@ -18,8 +18,8 @@ Hermes is a project by [Rhizomatica](https://www.rhizomatica.org/) dedicated to 
 
 ```bash
 # Clone the repository
-git clone https://github.com/Rhizomatica/hermes-webservice.git
-cd hermes-webservice
+git clone https://github.com/Rhizomatica/hermes-backend.git
+cd hermes-backend
 
 # Install dependencies
 npm install

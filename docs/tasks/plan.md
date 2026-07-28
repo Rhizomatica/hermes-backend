@@ -1,4 +1,4 @@
-# Hermes Webservice — Development Plan
+# Hermes Backend — Development Plan
 
 Based on the current documentation structure and the sBitx v2 constraints, here's a phased development plan moving from architecture docs → working code.
 

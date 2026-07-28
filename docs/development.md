@@ -1,4 +1,4 @@
-# Hermes Webservice — Development Guide
+# Hermes Backend — Development Guide
 
 ## Prerequisites
 
@@ -20,8 +20,8 @@ For on-device testing with the sBitx v2:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Rhizomatica/hermes-webservice.git
-cd hermes-webservice
+git clone https://github.com/Rhizomatica/hermes-backend.git
+cd hermes-backend
 
 # 2. Install dependencies
 npm install
@@ -43,7 +43,7 @@ curl http://localhost:3000/health
 ## Project Structure
 
 ```
-hermes-webservice/
+hermes-backend/
 ├── README.md
 ├── LICENSE
 ├── CONTRIBUTING.md

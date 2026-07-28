@@ -1,10 +1,10 @@
-# Architecture Review Prompt — Hermes Webservice
+# Architecture Review Prompt — Hermes Backend
 
 **For agent**: `.claude/agents/auditor-arch.agent.md` ( 🔍 Architecture Auditor )
 
 ---
 
-Review the following architecture documentation for the **Hermes Webservice** — a next-generation backend for HF radio communication stations that enables remote, rural, and disaster-affected communities to exchange messages, files, audio, and GPS coordinates over HF radio.
+Review the following architecture documentation for the **Hermes Backend** — a next-generation backend for HF radio communication stations that enables remote, rural, and disaster-affected communities to exchange messages, files, audio, and GPS coordinates over HF radio.
 
 ## Target Hardware
 

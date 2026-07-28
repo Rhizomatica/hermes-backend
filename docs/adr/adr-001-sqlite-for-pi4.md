@@ -8,7 +8,7 @@ Supersedes the original ADR-002 from [hermes-backend](https://github.com/Rhizoma
 
 ## Context
 
-The hermes-webservice targets the **sBitx v2** hardware platform — a Raspberry Pi 4 with 4 GB RAM running a single HF radio transceiver. The original hermes-backend architecture chose PostgreSQL 17 for concurrent writes, JSONB indexing, full-text search, TimescaleDB time-series, and row-level security. These are correct for a **multi-station server deployment** but not for a **single-station field device**.
+The hermes-backend targets the **sBitx v2** hardware platform — a Raspberry Pi 4 with 4 GB RAM running a single HF radio transceiver. The original hermes-backend architecture chose PostgreSQL 17 for concurrent writes, JSONB indexing, full-text search, TimescaleDB time-series, and row-level security. These are correct for a **multi-station server deployment** but not for a **single-station field device**.
 
 ### Hardware Constraints
 

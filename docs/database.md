@@ -1,6 +1,6 @@
 # HERMES Database Schema
 
-**Project**: hermes-webservice  
+**Project**: hermes-backend  
 **Status**: Architecture Design — Adapted for sBitx v2 (Raspberry Pi 4)  
 **Based on**: [hermes-backend](https://github.com/Rhizomatica/hermes-backend) architecture
 
@@ -1280,7 +1280,7 @@ On low-battery signal (GPIO trigger) or `systemctl stop`:
 ### 12.4 Boot-Time Recovery Sequence
 
 ```
-1. System boots → systemd starts hermes-webservice
+1. System boots → systemd starts hermes-backend
 2. Filesystem check: ext4 journal replay (automatic) or f2fs recovery
 3. SQLite database opens:
    - WAL auto-recovery: uncommitted frames discarded
