@@ -327,4 +327,4 @@ High SWR (> 3.0) indicates antenna mismatch and can damage the transmitter. The 
 
 ## Testing
 
-See [docs/testing-strategy.md](testing-strategy.md) for how to use `SimulatedRadioDriver` in tests.
+See [docs/development/testing.md](testing.md) for how to use `SimulatedRadioDriver` in tests.

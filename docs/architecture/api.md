@@ -60,7 +60,7 @@ Accept-Language: es-MX, es;q=0.9
 
 **Changing language**: Users update their preference via `PATCH /users/me` with `{ "locale": "es" }`. This invalidates existing JWT tokens (old tokens carry the old locale) — the client must re-authenticate.
 
-See [docs/i18n.md](i18n.md) for the full internationalization strategy.
+See [docs/development/i18n.md](../development/i18n.md) for the full internationalization strategy.
 
 ---
 
@@ -88,7 +88,7 @@ See [docs/i18n.md](i18n.md) for the full internationalization strategy.
 
 | Removed | Replacement |
 |---------|-------------|
-| PostgreSQL 17 + TimescaleDB | SQLite (WAL mode) — see [database.md](database.md) |
+| PostgreSQL 17 + TimescaleDB | SQLite (WAL mode) — see [database.md](../architecture/database.md) |
 | Redis 7 (Pub/Sub, BullMQ, sessions) | In-process EventEmitter + in-memory queues + SQLite sessions |
 | mediasoup SFU + coturn | Gated behind `ENABLE_WEBRTC=false` config flag (default off on Pi 4) |
 | OpenTelemetry tracing | Disabled by default; can be enabled for debugging |
@@ -1210,6 +1210,6 @@ Items under consideration for future phases:
 
 ## Related Documents
 
-- [Database Schema](database.md) — Full normalized SQLite schema with indexes, migrations, retention policies, power-loss strategy, and clock sync
+- [Database Schema](../architecture/database.md) — Full normalized SQLite schema with indexes, migrations, retention policies, power-loss strategy, and clock sync
 - [Architecture Audit](architecture-audit-sbitx-v2.md) — Critical risks, memory budget, and hardware feasibility assessment
 - [hermes-backend Architecture](https://github.com/Rhizomatica/hermes-backend) — Upstream architecture documentation

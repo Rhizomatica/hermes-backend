@@ -197,5 +197,5 @@ Considered but rejected: RS256 JWTs have broader ecosystem support (libraries, d
 
 - [RFC 7519 — JSON Web Token](https://datatracker.ietf.org/doc/html/rfc7519)
 - [Refresh Token Rotation](https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/)
-- [docs/api.md](../api.md) §3 — Authentication endpoints
-- [docs/database.md](../database.md) §3 — `users` and `user_sessions` tables
+- [docs/api.md](../architecture/api.md) §3 — Authentication endpoints
+- [docs/database.md](../architecture/database.md) §3 — `users` and `user_sessions` tables

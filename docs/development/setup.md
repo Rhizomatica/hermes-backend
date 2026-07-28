@@ -58,17 +58,20 @@ hermes-backend/
 │
 ├── docs/
 │   ├── api.md                    # REST API specification
-│   ├── database.md               # Database schema & design
-│   ├── architecture-audit-sbitx-v2.md
+│   ├── architecture/api.md
+│   ├── architecture/database.md
+│   ├── architecture/websocket.md
+│   ├── architecture/hardware-integration.md
+│   ├── audits/sbitx-v2.md
 │   ├── adr/                      # Architecture Decision Records
-│   ├── development.md            # This file
-│   ├── ci-cd.md
-│   ├── testing-strategy.md
-│   ├── security.md
-│   ├── deployment.md
-│   ├── websocket.md
-│   ├── hardware-integration.md
-│   └── observability.md
+│   ├── development/setup.md
+│   ├── development/ci-cd.md
+│   ├── development/testing.md
+│   ├── operations/security.md
+│   ├── operations/deployment.md
+│   ├── architecture/websocket.md
+│   ├── architecture/hardware-integration.md
+│   └── operations/observability.md
 │
 ├── prompts/                      # AI agent prompt templates
 │
@@ -158,7 +161,7 @@ npm run test:coverage
 # Open coverage/index.html in browser
 ```
 
-See [docs/testing-strategy.md](testing-strategy.md) for detailed testing guidelines.
+See [docs/development/testing.md](testing.md) for detailed testing guidelines.
 
 ## Database
 
@@ -274,7 +277,7 @@ npx vitest run tests/unit/i18n/
 curl -H "Accept-Language: es" http://localhost:3000/health
 ```
 
-See [docs/i18n.md](i18n.md) for the full internationalization strategy.
+See [docs/development/i18n.md](../development/i18n.md) for the full internationalization strategy.
 
 ---
 

@@ -14,11 +14,11 @@ HERMES enables communities in remote or disaster-affected areas to exchange mess
 
 | Document | Description |
 |----------|-------------|
-| [REST API](docs/api.md) | Complete HTTP API reference — authentication, radio management, conversations, messaging, geolocation, system management, WebSocket gateway, and security |
-| [Database Schema](docs/database.md) | Full normalized SQLite schema — entity relationships, table definitions, indexes, migrations, retention policies, power-loss strategy, and Drizzle ORM TypeScript mapping |
-| [Architecture Audit](docs/architecture-audit-sbitx-v2.md) | Adversarial architecture audit for sBitx v2 — critical risks, power-loss analysis, memory budget, and hardware feasibility assessment |
-| [WebSocket Protocol](docs/websocket.md) | Realtime gateway protocol — subprotocol `hermes-v1`, message frames, topic subscriptions, sync protocol, heartbeat, connection limits |
-| [Hardware Integration](docs/hardware-integration.md) | sBitx CLI command reference, HAL driver contract (`IRadioDriver`), simulated vs real driver behavior, SWR protection |
+| [REST API](docs/architecture/api.md) | Complete HTTP API reference — authentication, radio management, conversations, messaging, geolocation, system management, WebSocket gateway, and security |
+| [Database Schema](docs/architecture/database.md) | Full normalized SQLite schema — entity relationships, table definitions, indexes, migrations, retention policies, power-loss strategy, and Drizzle ORM TypeScript mapping |
+| [Architecture Audit](docs/audits/sbitx-v2.md) | Adversarial architecture audit for sBitx v2 — critical risks, power-loss analysis, memory budget, and hardware feasibility assessment |
+| [WebSocket Protocol](docs/architecture/websocket.md) | Realtime gateway protocol — subprotocol `hermes-v1`, message frames, topic subscriptions, sync protocol, heartbeat, connection limits |
+| [Hardware Integration](docs/architecture/hardware-integration.md) | sBitx CLI command reference, HAL driver contract (`IRadioDriver`), simulated vs real driver behavior, SWR protection |
 
 ### Architecture Decision Records
 
@@ -33,14 +33,14 @@ HERMES enables communities in remote or disaster-affected areas to exchange mess
 
 | Document | Description |
 |----------|-------------|
-| [Development Plan](docs/tasks/plan.md) | 10-phase development roadmap with 90+ tasks across ~18 weeks |
-| [Development Guide](docs/development.md) | Local dev setup, project structure, available scripts, debugging |
+| [Development Plan](docs/development/plan.md) | 10-phase development roadmap with 90+ tasks across ~18 weeks |
+| [Development Guide](docs/development/setup.md) | Local dev setup, project structure, available scripts, debugging |
 | [Contributing](CONTRIBUTING.md) | PR process, commit conventions, branch strategy, testing requirements |
-| [Testing Strategy](docs/testing-strategy.md) | Testing pyramid (unit → integration → E2E), mock strategy, coverage targets |
-| [CI/CD Strategy](docs/ci-cd.md) | GitHub Actions workflows, deploy to Pi 4, Docker strategy, quality gates |
-| [Security Model](docs/security.md) | Threat model, auth (JWT RS256 + RBAC), rate limiting, input validation, audit logging |
-| [Deployment Guide](docs/deployment.md) | Pi 4 installation, systemd service, SD card optimization, backup/restore |
-| [Observability Guide](docs/observability.md) | Logging (Pino), metrics (Prometheus, opt-in), health checks, field debugging |
+| [Testing Strategy](docs/development/testing.md) | Testing pyramid (unit → integration → E2E), mock strategy, coverage targets |
+| [CI/CD Strategy](docs/development/ci-cd.md) | GitHub Actions workflows, deploy to Pi 4, Docker strategy, quality gates |
+| [Security Model](docs/operations/security.md) | Threat model, auth (JWT RS256 + RBAC), rate limiting, input validation, audit logging |
+| [Deployment Guide](docs/operations/deployment.md) | Pi 4 installation, systemd service, SD card optimization, backup/restore |
+| [Observability Guide](docs/operations/observability.md) | Logging (Pino), metrics (Prometheus, opt-in), health checks, field debugging |
 
 ### Project Files
 
@@ -55,7 +55,7 @@ HERMES enables communities in remote or disaster-affected areas to exchange mess
 
 | Document | Status |
 |----------|--------|
-| [Legacy REST API Fragment](docs/rest_api.md) | Superseded by [`docs/api.md`](docs/api.md); references removed PostgreSQL/Redis components |
+| [Legacy REST API Fragment](docs/rest_api.md) | Superseded by [`docs/api.md`](docs/architecture/api.md); references removed PostgreSQL/Redis components |
 
 ---
 

@@ -31,7 +31,7 @@ cp .env.example .env
 npm test
 ```
 
-See [docs/development.md](docs/development.md) for detailed setup instructions.
+See [docs/development.md](docs/development/setup.md) for detailed setup instructions.
 
 ## Development Workflow
 
@@ -71,7 +71,7 @@ test(messaging): add idempotency tests for message creation
 ### Pull Request Process
 
 1. Create a feature branch from `develop`
-2. Write code with tests (see [docs/testing-strategy.md](docs/testing-strategy.md))
+2. Write code with tests (see [docs/testing-strategy.md](docs/development/testing.md))
 3. Ensure all tests pass: `npm test`
 4. Ensure linting passes: `npm run lint`
 5. Ensure formatting: `npm run format`
@@ -79,7 +79,7 @@ test(messaging): add idempotency tests for message creation
 7. All PRs require at least one review before merge
 8. The PR description must include:
    - What the change does
-   - Which phase/task from `docs/tasks/plan.md` it addresses
+   - Which phase/task from `docs/development/plan.md` it addresses
    - Testing performed
    - Any deployment considerations
 
@@ -107,8 +107,8 @@ Open an issue with:
 
 ## Documentation
 
-- API changes must update `docs/api.md`
-- Schema changes must update `docs/database.md` and include migration files
+- API changes must update `docs/architecture/api.md`
+- Schema changes must update `docs/architecture/database.md` and include migration files
 - New architectural decisions require an ADR in `docs/adr/`
 - Significant changes should include updates to `CHANGELOG.md`
 

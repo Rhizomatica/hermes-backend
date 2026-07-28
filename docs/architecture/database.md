@@ -1435,6 +1435,6 @@ The client calculates: `clockOffset = serverTime - localTime` and adjusts displa
 
 ## Related Documents
 
-- [REST API](api.md) — Full API endpoint documentation with request/response schemas
+- [REST API](../architecture/api.md) — Full API endpoint documentation with request/response schemas
 - [Architecture Audit](architecture-audit-sbitx-v2.md) — Critical risks, memory budget, and hardware feasibility assessment
 - [hermes-backend Architecture](https://github.com/Rhizomatica/hermes-backend) — Upstream architecture

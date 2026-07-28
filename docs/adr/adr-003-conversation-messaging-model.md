@@ -119,6 +119,6 @@ Rejected: Requires a homeserver process (Synapse, ~200–500 MB RAM). Too heavy 
 
 ## References
 
-- [docs/api.md](../api.md) §4 — Conversation and messaging endpoints
-- [docs/database.md](../database.md) §4–7 — Conversation, message, and delivery tables
+- [docs/api.md](../architecture/api.md) §4 — Conversation and messaging endpoints
+- [docs/database.md](../architecture/database.md) §4–7 — Conversation, message, and delivery tables
 - Signal Protocol Design — Inspiration for conversation-based messaging with per-recipient delivery tracking

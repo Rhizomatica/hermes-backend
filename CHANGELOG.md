@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- See `docs/tasks/plan.md` for the full 10-phase development roadmap.
+- See `docs/development/plan.md` for the full 10-phase development roadmap.
 
 ---
 
@@ -16,10 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial project documentation and architecture specification
-- Full REST API specification (`docs/api.md`) — 1081 lines covering all endpoints
-- Full database schema (`docs/database.md`) — 1436 lines, 17+ tables, SQLite WAL mode design
-- Architecture audit for sBitx v2 Raspberry Pi 4 deployment (`docs/architecture-audit-sbitx-v2.md`)
-- 10-phase development plan with 90+ discrete tasks (`docs/tasks/plan.md`)
+- Full REST API specification (`docs/architecture/api.md`) — 1081 lines covering all endpoints
+- Full database schema (`docs/architecture/database.md`) — 1436 lines, 17+ tables, SQLite WAL mode design
+- Architecture audit for sBitx v2 Raspberry Pi 4 deployment (`docs/audits/sbitx-v2.md`)
+- 10-phase development plan with 90+ discrete tasks (`docs/development/plan.md`)
 - Root-level project files: `README.md`, `LICENSE` (GPLv3), `CONTRIBUTING.md`, `CHANGELOG.md`, `.gitignore`, `.env.example`
 - Architecture Decision Records: ADR-001 through ADR-004
 - Supporting documentation: development setup, CI/CD strategy, testing strategy, security model, deployment guide, WebSocket protocol, hardware integration guide, observability guide

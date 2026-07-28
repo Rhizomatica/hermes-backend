@@ -118,5 +118,5 @@ Rejected: Tight coupling between the messaging domain and the WebSocket gateway 
 ## References
 
 - [Node.js EventEmitter Documentation](https://nodejs.org/api/events.html)
-- [docs/websocket.md](../websocket.md) — WebSocket realtime gateway design
+- [docs/websocket.md](../architecture/websocket.md) — WebSocket realtime gateway design
 - [README.md](../../README.md) — Architecture diagram showing event bus integration

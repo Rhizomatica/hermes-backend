@@ -117,5 +117,5 @@ Rejected: Adds complexity (replication, HTTP interface) not needed for single-st
 
 - [hermes-backend ADR-002](https://github.com/Rhizomatica/hermes-backend) — Original PostgreSQL decision
 - [SQLite WAL Mode Documentation](https://www.sqlite.org/wal.html)
-- [docs/architecture-audit-sbitx-v2.md](../architecture-audit-sbitx-v2.md) — Full hardware feasibility audit
-- [docs/database.md](../database.md) — Complete schema design
+- [docs/architecture-audit-sbitx-v2.md](../audits/sbitx-v2.md) — Full hardware feasibility audit
+- [docs/database.md](../architecture/database.md) — Complete schema design
