@@ -12,6 +12,10 @@ The schema is fully normalized (3NF minimum) with deliberate denormalizations wh
 
 This schema is designed for **SQLite in WAL mode** as the primary production database for single-station sBitx v2 deployments on Raspberry Pi 4. A `DatabaseAdapter` interface in the repository layer abstracts the database backend, enabling PostgreSQL for multi-station server deployments without changing application code.
 
+### Deployment Model
+
+The hermes-backend runs on a **Raspberry Pi 4** accessed via **local WiFi hotspot**. Clients (browser on phone/laptop) connect to the Pi directly. All data lives in SQLite on the Pi — the server is the single source of truth. There is no offline sync protocol or multi-device conflict resolution. Clients that disconnect simply fetch current state via the REST API on reconnection.
+
 ### Guiding Principles
 
 | Principle | Implementation |
@@ -39,9 +43,9 @@ This schema is designed for **SQLite in WAL mode** as the primary production dat
 | Job Queues | In-memory priority queue + SQLite jobs table |
 | Session Store | SQLite (`user_sessions` table) |
 
-### Why SQLite for sBitx v2 (ADR-002 — Revised)
+### Why SQLite for sBitx v2
 
-The original ADR-002 chose PostgreSQL for concurrent writes, JSONB, full-text search, and TimescaleDB. These are correct for a **server deployment**. On a **Raspberry Pi 4 field station**, the calculus is different:
+The original hermes-backend architecture chose PostgreSQL for concurrent writes, JSONB, full-text search, and TimescaleDB. These are correct for a **server deployment**. On a **Raspberry Pi 4 field station**, the calculus is different:
 
 | Criteria | SQLite (WAL mode) | PostgreSQL 17 | Winner for Pi 4 |
 |----------|:---:|:---:|:---:|
@@ -102,7 +106,7 @@ erDiagram
 	users||--o{audit_logs:"performs"
 	users||--o{radio_profiles:"configures"
 	users||--o{connection_schedules:"creates"
-	users||--o{sync_cursors:"tracks"
+	users||--o{attachments:"uploads"
 	conversations||--o{conversation_participants:"contains"
 	conversations||--o{messages:"contains"
 	conversations||--o{attachments:"contains"
@@ -114,11 +118,6 @@ erDiagram
 	messages||--o|messages:"forwarded_from"
 	radio_profiles||--o{radio_sessions:"used_by"
 	frequencies||--o{connection_schedules:"scheduled"
-	user_devices||--o{sync_cursors:"cursor"
-	users||--o{sync_queue:"target_user"
-	user_devices||--o{sync_queue:"target_device"
-	users||--o{attachments:"uploads"
-	users}|--|{Untitled-Entity:"  "
 
     users {
         text id PK "UUID"
@@ -254,27 +253,6 @@ erDiagram
         text created_by FK
     }
 
-    sync_cursors {
-        text id PK "UUID"
-        text user_id FK
-        text device_id FK
-        text entity_type "messages|conversations|reactions|..."
-        int last_event_sequence "Monotonic"
-        text last_synced_at
-    }
-
-    sync_queue {
-        text id PK "UUID"
-        text target_user_id FK
-        text target_device_id FK
-        text entity_type
-        text entity_id
-        text operation "create|update|delete"
-        int priority "1-10"
-        int sequence "Monotonic"
-        text processed_at
-    }
-
     audit_logs {
         text id PK "UUID"
         text actor_id FK
@@ -325,9 +303,6 @@ erDiagram
 | `messages` | `message_envelopes` | 1:1 | CASCADE |
 | `radio_profiles` | `radio_sessions` | 1:∞ | SET NULL |
 | `frequencies` | `connection_schedules` | 1:∞ | SET NULL |
-| `user_devices` | `sync_cursors` | 1:∞ | CASCADE |
-| `users` | `sync_queue` (target) | 1:∞ | CASCADE |
-| `user_devices` | `sync_queue` (target device) | 1:∞ | CASCADE |
 
 ---
 
@@ -403,7 +378,7 @@ CREATE INDEX idx_user_sessions_expires_active ON user_sessions (expires_at)
 
 #### `user_devices`
 
-Tracks devices per user for multi-device sync and push notifications.
+Tracks devices per user for push notifications and session management.
 
 ```sql
 CREATE TABLE user_devices (
@@ -585,8 +560,6 @@ CREATE INDEX idx_deliveries_next_retry ON message_deliveries (next_retry_at)
 | `radio` | Target station reachable via HF | UUCP acknowledgment |
 | `email` | Recipient has email configured | SMTP delivery report |
 | `sms` | Recipient has SMS configured | SMS gateway delivery report |
-
-**Multi-device delivery:** When a user has multiple devices, a delivery record is created per device per channel. The aggregate status shown to the sender is the highest status across all records for that recipient.
 
 #### `message_reactions`
 
@@ -871,58 +844,7 @@ CREATE INDEX idx_gps_station_time ON gps_20260717 (station_id, time DESC);
 
 ---
 
-### 4.8 Synchronization
-
-#### `sync_cursors`
-
-Tracks each device's synchronization position per entity type. Used by the sync engine to deliver deltas on reconnection.
-
-```sql
-CREATE TABLE sync_cursors (
-    id                  TEXT PRIMARY KEY,           -- Application-generated UUID
-    user_id             TEXT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    device_id           TEXT REFERENCES user_devices (id) ON DELETE CASCADE,
-    entity_type         TEXT NOT NULL,              -- 'messages' | 'conversations' | 'reactions' | etc.
-    last_synced_at      TEXT NOT NULL,              -- ISO 8601 UTC
-    last_event_sequence INTEGER NOT NULL DEFAULT 0, -- Monotonic sequence for ordering
-    UNIQUE (user_id, device_id, entity_type)
-);
-
-CREATE INDEX idx_sync_cursors_user ON sync_cursors (user_id, device_id);
-```
-
-**Monotonic sequences**: The `last_event_sequence` column is the primary ordering mechanism for sync. It is a monotonically increasing integer, not a wall-clock timestamp. This is critical for air-gapped stations where the system clock may be unreliable — sync ordering never depends on clock correctness.
-
-#### `sync_queue`
-
-Outbound delivery queue for offline devices. Populated when a target device is offline; consumed when the device reconnects. Stores entity references, never serialized payload snapshots.
-
-```sql
-CREATE TABLE sync_queue (
-    id              TEXT PRIMARY KEY,               -- Application-generated UUID
-    target_user_id  TEXT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    target_device_id TEXT REFERENCES user_devices (id) ON DELETE CASCADE,
-    entity_type     TEXT NOT NULL,
-    entity_id       TEXT NOT NULL,
-    operation       TEXT NOT NULL CHECK (operation IN ('create', 'update', 'delete')),
-    priority        INTEGER NOT NULL DEFAULT 5,     -- 1=highest, 10=lowest
-    sequence        INTEGER NOT NULL,               -- Monotonic, per-user ordering
-    created_at      TEXT NOT NULL,                  -- ISO 8601 UTC
-    processed_at    TEXT,                           -- ISO 8601 UTC
-    error           TEXT
-);
-
-CREATE INDEX idx_sync_queue_target ON sync_queue (target_user_id, target_device_id, sequence)
-    WHERE processed_at IS NULL;
-CREATE INDEX idx_sync_queue_priority ON sync_queue (priority, created_at)
-    WHERE processed_at IS NULL;
-```
-
-**Sync catch-up**: If more than 500 events accumulated for a device, the sync engine sends a `SYNC_SUMMARY` with conversation-level unread counts instead of individual `SYNC_DELTA` frames. The client lazy-loads conversations individually.
-
----
-
-### 4.9 Job Queue (SQLite-Backed)
+### 4.8 Job Queue (SQLite-Backed)
 
 In-memory priority queue with SQLite persistence for job durability across process restarts. Replaces BullMQ/Redis.
 
@@ -957,11 +879,11 @@ CREATE INDEX idx_jobs_scheduled ON jobs (scheduled_at)
 - On process restart, the queue is rehydrated from `jobs WHERE status IN ('queued', 'running')`
 - Running jobs at restart time are treated as failed (no partial execution)
 
-**Degraded mode**: If the jobs table write fails (database locked), the job still executes from the in-memory queue. Database persistence is best-effort — this is acceptable for a single Pi 4 where process restarts are rare.
+**Important**: Job persistence to SQLite is mandatory, not best-effort. The HTTP response must not be acknowledged until the job row is written with `status=queued`. On recovery, all `queued` jobs are re-queued for execution.
 
 ---
 
-### 4.10 Audit Logs
+### 4.9 Audit Logs
 
 Immutable audit trail. Never updated or deleted. Records all significant state changes across the platform.
 
@@ -1019,7 +941,6 @@ CREATE INDEX idx_audit_action ON audit_logs (action, created_at DESC);
 | `messages` | Lookup by client_message_id (dedup) | `(client_message_id)` UNIQUE, partial WHERE client_message_id IS NOT NULL |
 | `message_deliveries` | Pending deliveries for retry | `(recipient_id, status)` partial |
 | `conversation_participants` | Active conversations for user | `(user_id)` WHERE `left_at IS NULL` |
-| `sync_queue` | Unprocessed items for device | `(target_user_id, target_device_id, sequence)` partial |
 | `radio_telemetry_*` | Station telemetry by time range | `(station_id, time DESC)` per daily table |
 | `gps_*` | Station GPS history | `(station_id, time DESC)` per daily table |
 | `audit_logs` | Entity audit trail | `(entity_type, entity_id, created_at)` |
@@ -1110,7 +1031,6 @@ npm run db:rollback
 | `radio_telemetry_*` (daily tables) | 90 days | Drop daily tables older than retention period via scheduled cleanup |
 | `gps_*` (daily tables) | 365 days | Drop daily tables older than retention period via scheduled cleanup |
 | `audit_logs` | 2 years | DELETE by `created_at` in batches (avoid long locks) |
-| `sync_queue` | 30 days | DELETE `WHERE processed_at IS NOT NULL AND created_at < 30 days` |
 | `messages` (deleted) | 90 days | DELETE `WHERE deleted_at IS NOT NULL AND deleted_at < 90 days` |
 | `user_sessions` (expired) | 7 days after expiry | DELETE `WHERE expires_at < now - 7 days OR revoked_at IS NOT NULL` |
 | `jobs` (completed) | 30 days | DELETE `WHERE status IN ('completed', 'cancelled') AND completed_at < 30 days` |
@@ -1221,7 +1141,7 @@ The legacy `hermes-api` already uses SQLite. The migration to the new schema inv
 | `files` table (separate FileController) | `attachments` (linked to messages) |
 | Flat radio profile struct | `radio_profiles` (normalized) |
 | No delivery tracking | `message_deliveries` (per-recipient, per-channel) |
-| No sync support | `sync_cursors` + `sync_queue` |
+| No sync support | N/A — clients fetch current state via REST on reconnect |
 | No audit logging | `audit_logs` (immutable) |
 | No job queue persistence | `jobs` table |
 
@@ -1315,8 +1235,7 @@ On low-battery signal (GPIO trigger) or `systemctl stop`:
 
 Air-gapped sBitx v2 stations may have no NTP server. The Raspberry Pi 4 has no RTC battery by default — the system clock resets to epoch (1970-01-01) on every power cycle. This means:
 - `created_at` timestamps will be nonsensical until the clock is set
-- Sync cursors based on timestamps will break
-- Message ordering will be wrong
+- Message ordering by timestamp will be incorrect
 
 ### 13.2 Clock Initialization Sequence
 
@@ -1340,26 +1259,11 @@ On boot, the system initializes the clock in this priority order:
 4. UNKNOWN TIME: If none of the above succeed
    → System clock remains at epoch or whatever the kernel boot time is
    → API responds with clock_synced: false in health endpoint
-   → Messages are stamped with monotonic sequence numbers (correct ordering)
-   → created_at timestamps will be updated retroactively when clock syncs
+   → created_at is stamped with current system time (may be epoch); messages are ordered by insertion order in conversation queries
+   → IMPORTANT: created_at is NEVER mutated after insertion. When the clock syncs, new messages get correct timestamps. Old messages retain their original created_at. Clients sort messages by created_at within a conversation — during the unknown-time window, this means epoch-stamped messages appear at the top, then correct timestamps appear after sync. This is an acceptable UX tradeoff for field-deployed stations without reliable timekeeping.
 ```
 
-### 13.3 Monotonic Sequence Numbers
-
-All sync ordering uses `last_event_sequence` (monotonically incrementing integer), **never timestamps**. This guarantees correct ordering even when the clock is wrong:
-
-```sql
--- Sync events are ordered by sequence, not by created_at
-SELECT * FROM sync_queue
-WHERE target_user_id = :userId
-  AND target_device_id = :deviceId
-  AND processed_at IS NULL
-  AND sequence > :lastKnownSequence
-ORDER BY sequence ASC
-LIMIT 100;
-```
-
-### 13.4 Clock Status API
+### 13.3 Clock Status API
 
 ```json
 // GET /api/v1/system/clock — Response 200
@@ -1381,7 +1285,7 @@ LIMIT 100;
 }
 ```
 
-### 13.5 Periodic Clock Sync
+### 13.4 Periodic Clock Sync
 
 | Source | Sync Interval | Notes |
 |--------|:---:|-------|
@@ -1389,7 +1293,7 @@ LIMIT 100;
 | Manual | On-demand (`POST /system/clock/sync`) | Operator sets via setup wizard or settings page |
 | Saved | On graceful shutdown only | `last_known_time` written during shutdown sequence |
 
-### 13.6 Client Clock Synchronization
+### 13.5 Client Clock Synchronization
 
 The WebSocket `AUTHENTICATED` response includes `serverTime` so clients can calculate clock offset:
 
@@ -1422,7 +1326,7 @@ The client calculates: `clockOffset = serverTime - localTime` and adjusts displa
 | Message editing | none | `edited_at` timestamp |
 | Message deletion | hard delete | soft delete (`deleted_at`) |
 | Attachments | separate FileController | linked to messages |
-| Multi-device | none | sync cursor per device |
+| Multi-device | none | multiple browser tabs share same DB state via REST + WebSocket |
 | Email compat | native only | optional envelope abstraction |
 | Group messages | none | group conversations |
 | Time-series | none | daily-sharded tables in separate DB files |
@@ -1435,6 +1339,6 @@ The client calculates: `clockOffset = serverTime - localTime` and adjusts displa
 
 ## Related Documents
 
-- [REST API](../architecture/api.md) — Full API endpoint documentation with request/response schemas
-- [Architecture Audit](architecture-audit-sbitx-v2.md) — Critical risks, memory budget, and hardware feasibility assessment
+- [REST API](api.md) — Full API endpoint documentation with request/response schemas
+- [Architecture Audit](../audits/sbitx-v2.md) — Critical risks, memory budget, and hardware feasibility assessment
 - [hermes-backend Architecture](https://github.com/Rhizomatica/hermes-backend) — Upstream architecture

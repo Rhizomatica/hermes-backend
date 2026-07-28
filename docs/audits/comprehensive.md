@@ -27,10 +27,13 @@ Below is the full audit by architectural domain.
 
 | Severity | Count | Key Themes |
 |----------|:-----:|------------|
-| 🔴 Critical | 4 | Data loss vectors, restart amplification, idempotency breakage, clock sync paradox |
-| 🟠 High | 9 | Silent event drops, sync engine gap, token invalidation race, no integrity checks, systemd restart loops, SD card wear unverified |
+| 🔴 Critical | 2 | Data loss vectors, restart amplification |
+| 🔴 ~~Critical~~ ✅ Resolved | 2 | ~~Idempotency breakage~~ (resolved: sync engine removed), ~~Sync cursor gap~~ (resolved: sync engine removed) |
+| 🟠 High | 9 | Silent event drops, token invalidation race, no integrity checks, systemd restart loops, SD card wear unverified |
 | 🟡 Medium | 11 | Adapter interface viability, legacy shim scope, Drizzle migration risks, no CRDT strategy, conversation query complexity, attachment token replay |
 | 🟢 Low | 6 | Documentation inconsistencies, naming, missing config validation, test gaps |
+
+> **Update (July 2026)**: The sync engine has been removed entirely. The hermes-backend runs on a Raspberry Pi 4 accessed via local WiFi hotspot — clients are browser windows into the Pi's state. On reconnect, clients fetch current state via the REST API. This eliminates the need for cursor-based sync, delta batching, conflict resolution, `sync_cursors`, `sync_queue`, and `event_sequence` columns. Findings **C-1** (idempotency breakage from retroactive timestamps) and **C-4** (sync cursor gap) are resolved by this simplification.
 
 ---
 

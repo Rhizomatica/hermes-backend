@@ -81,15 +81,14 @@ Based on the current documentation structure and the sBitx v2 constraints, here'
 | D2.8 | `radio_profiles` + `radio_sessions` tables + repositories | Unit |
 | D2.9 | `frequencies` + `connection_schedules` tables + repositories | Unit |
 | D2.10 | `audit_logs` table + repository (immutable, append-only) | Unit |
-| D2.11 | `sync_cursors` + `sync_queue` tables + repositories | Unit |
-| D2.12 | `jobs` table + repository (SQLite-backed queue) | Unit |
-| D2.13 | `DatabaseAdapter` interface implemented for all repositories | Unit |
-| D2.14 | Migration pipeline: `npm run db:generate`, `db:migrate`, `db:rollback` | Manual |
-| D2.15 | Migration: add `locale` column to `users` table (DEFAULT 'en', CHECK IN) | Unit |
-| D2.16 | Migration: add `locale` column to `audit_logs` table (DEFAULT 'en') | Unit |
-| D2.17 | Migration: add `locale` column to `message_envelopes` table (DEFAULT 'en') | Unit |
+| D2.11 | `jobs` table + repository (SQLite-backed queue) | Unit |
+| D2.12 | `DatabaseAdapter` interface implemented for all repositories | Unit |
+| D2.13 | Migration pipeline: `npm run db:generate`, `db:migrate`, `db:rollback` | Manual |
+| D2.14 | Migration: add `locale` column to `users` table (DEFAULT 'en', CHECK IN) | Unit |
+| D2.15 | Migration: add `locale` column to `audit_logs` table (DEFAULT 'en') | Unit |
+| D2.16 | Migration: add `locale` column to `message_envelopes` table (DEFAULT 'en') | Unit |
 
-**Milestone**: All 17+ tables created, indexed, and queryable. All repository tests pass against in-memory SQLite. Locale columns present on all i18n-relevant tables.
+**Milestone**: All 15 tables created, indexed, and queryable. All repository tests pass against in-memory SQLite. Locale columns present on all i18n-relevant tables. No sync tables needed — clients fetch current state via REST on reconnect.
 
 ---
 
@@ -147,9 +146,9 @@ Based on the current documentation structure and the sBitx v2 constraints, here'
 
 ---
 
-## Phase 5: WebSocket Gateway & Sync Engine (Week 9–10)
+## Phase 5: WebSocket Gateway (Week 9–10)
 
-**Goal**: Real-time event streaming and offline sync work.
+**Goal**: Real-time event streaming via WebSocket. No sync protocol needed — clients fetch current state via REST on reconnect.
 
 | Task | Deliverable | Tests |
 |------|-------------|-------|
@@ -162,14 +161,11 @@ Based on the current documentation structure and the sBitx v2 constraints, here'
 | D5.7 | `TYPING_START` / `TYPING_STOP` (rate-limited: 1 per 2 sec) | Integration |
 | D5.8 | `PRESENCE_UPDATE` — online/offline/away | Integration |
 | D5.9 | Heartbeat: PING/PONG every 30 seconds | Integration |
-| D5.10 | `SYNC_REQUEST` → `SYNC_DELTA` batching (100 events/batch) | Integration |
-| D5.11 | `SYNC_SUMMARY` catch-up (when missed events > 500) | Integration |
-| D5.12 | `SYNC_COMPLETE` with updated cursors | Integration |
-| D5.13 | `sync_queue` population when devices are offline | Unit |
-| D5.14 | WebSocket connection limits (max 10 concurrent) | Integration |
-| D5.15 | Auth timeout: drop unauthenticated connections after 10s | Integration |
+| D5.10 | WebSocket backpressure handling: `STALE_CONNECTION` + code `4010` | Integration |
+| D5.11 | WebSocket connection limits (max 20 concurrent) | Integration |
+| D5.12 | Auth timeout: drop unauthenticated connections after 10s | Integration |
 
-**Milestone**: WebSocket clients receive real-time radio telemetry and message events. Offline reconnection sync delivers missed events in batches. System notifications are locale-aware per connection.
+**Milestone**: WebSocket clients receive real-time radio telemetry and message events. Reconnection is handled purely via REST API — clients fetch current state on reconnect. No sync engine, no cursor management, no delta batching. System notifications are locale-aware per connection.
 
 ---
 

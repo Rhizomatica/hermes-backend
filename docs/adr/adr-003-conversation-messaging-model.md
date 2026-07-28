@@ -84,7 +84,7 @@ This enables:
 - **Intuitive UX**: Conversations match user expectations from modern messaging apps
 - **Natural group support**: Adding participants to a conversation is a single operation
 - **Fine-grained delivery tracking**: Know exactly which recipients got the message and via which channel
-- **Efficient sync**: `event_sequence` per conversation enables cursor-based sync ("give me events since sequence 142")
+- **Simple reconnection**: Clients that disconnect simply fetch current state via the REST API on reconnect — no cursor-based sync needed
 - **Thread-ready**: Future support for message threading (reply chains) maps naturally to the conversation model
 - **Reactions**: Reactions are per-message within a conversation — no inbox fragmentation
 
