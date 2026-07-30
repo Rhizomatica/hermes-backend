@@ -47,10 +47,7 @@
     },
 
     /* Output */
-    "skipLibCheck": true,
-
-    /* TS 6.0 migration preparedness */
-    "ignoreDeprecations": "6.0"
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "tests"]
