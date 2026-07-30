@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 0.B — Tooling Setup |
 | **Branch** | `feat/phase-0b-tooling` |
-| **Last Commit** | — (branch not yet created) |
+| **Last Commit** | `3163eb0` — feat(db): add DatabaseAdapter interface and SQLiteAdapter implementation |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -22,10 +22,10 @@
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| D0.B.1 — Initialize repo (`package.json`, `tsconfig.json`, ESLint, Prettier, Vitest) | ⬜ TODO | — |
-| D0.B.2 — Set up Drizzle ORM with SQLite adapter, initial migration | ⬜ TODO | — |
-| D0.B.3 — Create `DatabaseAdapter` interface + `SQLiteAdapter` implementation | ⬜ TODO | — |
-| Quality Gate — `npm test` (empty suite), `npm run build` (zero TS errors) | ⬜ PENDING | — |
+| D0.B.1 — Initialize repo (`package.json`, `tsconfig.json`, ESLint, Prettier, Vitest) | ✅ | `91452aa` |
+| D0.B.2 — Set up Drizzle ORM with SQLite adapter, initial migration | ✅ | `8363247` |
+| D0.B.3 — Create `DatabaseAdapter` interface + `SQLiteAdapter` implementation | ✅ | `3163eb0` |
+| Quality Gate — `npm test` (empty suite), `npm run build` (zero TS errors) | ✅ | `3163eb0` |
 
 ### Phase 1 — Core Infrastructure & Auth
 
@@ -85,15 +85,20 @@
 
 ## Next Task
 
-> **D0.B.1** — Initialize repo: `package.json`, `tsconfig.json`, ESLint, Prettier, Vitest config
+> **Phase 1, D1.1** — Fastify v5 server with health endpoint (`GET /health`, `GET /health/deep`)
+
+**Phase 0.B is complete.** The branch `feat/phase-0b-tooling` is ready for PR. After merge, create branch `feat/phase-1-core-infra` and begin Phase 1.
 
 ---
 
 ## Notes & Blockers
 
-- Phase 0.A (Documentation) is complete. All architecture docs, ADRs, and audits are finalized on `main`.
-- The project is currently empty — no `src/` directory exists yet. Phase 0.B bootstraps the entire tooling foundation.
-- All subsequent phases (1–9) are blocked until Phase 0.B quality gate passes.
+- Phase 0.B is complete. All quality gates pass:
+  - `npm run build` — zero TypeScript errors
+  - `npm test` — 1 test passes (placeholder)
+  - Migration against `:memory:` — users table with 13 columns, 5 indexes
+- Branch `feat/phase-0b-tooling` ready for PR.
+- After merge, start Phase 1 on branch `feat/phase-1-core-infra`.
 
 ---
 
@@ -101,7 +106,7 @@
 
 | Date | Session | Tasks Completed |
 |------|---------|----------------|
-| — | — | (No development sessions yet) |
+| 2026-07-30 | Session 1 | D0.B.1, D0.B.2, D0.B.3, Quality Gate |
 
 ---
 
