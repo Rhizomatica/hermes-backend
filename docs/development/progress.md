@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 1 — Core Infrastructure & Auth |
 | **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `54d4183` — feat(auth): implement refresh token rotation with reuse detection |
+| **Last Commit** | `5c67f75` — feat(auth): add POST /auth/logout endpoint with session revocation |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -40,7 +40,7 @@
 | D1.6 — JWT RS256 key pair generation + sign/verify utilities + unit tests | ✅ | `b333617` |
 | D1.7 — `POST /auth/login` | ✅ | `aba6762` |
 | D1.8 — `POST /auth/refresh` — token rotation with reuse detection | ✅ | `54d4183` |
-| D1.9 — `POST /auth/logout` | ⬜ TODO | — |
+| D1.9 — `POST /auth/logout` | ✅ | `5c67f75` |
 | D1.10 — `user_sessions` table + repository | ✅ | `aba6762` |
 | D1.11 — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard) | ⬜ TODO | — |
 | D1.12 — `GET /users/me`, `POST /users`, `GET /users` (admin) | ⬜ TODO | — |
@@ -98,7 +98,7 @@
 
 ## Next Task
 
-> **D1.9** — `POST /auth/logout`
+> **D1.11** — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard)
 
 ---
 
@@ -113,6 +113,8 @@
 - D1.8 complete: `POST /auth/refresh` with full ADR-004 token rotation + reuse detection. 15 tests pass.
   - 5 new integration tests: normal rotation, reuse detection, invalid/expired/revoked tokens
   - Schema migration `0001_add_refresh_replaced_by.sql` for `user_sessions.refresh_replaced_by` column
+- D1.9 complete: `POST /auth/logout` with session revocation. Idempotent (already-revoked → 200). 21 tests pass overall.
+  - 6 new integration tests: valid revocation, idempotent, invalid token, orphan token, expired token, multi-session isolation
 
 ---
 
@@ -124,6 +126,7 @@
 | 2026-07-30 | Session 1b | Review fixes: prune deps, drop baseUrl, vite-tsconfig-paths, meaningful test |
 | 2026-08-03 | Session 2 | D1.1-D1.7, D1.10, review fixes, dotenv/config fix |
 | 2026-08-03 | Session 3 | D1.8 — refresh token rotation with reuse detection |
+| 2026-08-03 | Session 4 | D1.9 — logout endpoint with session revocation (6 tests) |
 
 ---
 
