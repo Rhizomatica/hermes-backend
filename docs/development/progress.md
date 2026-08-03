@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 1 — Core Infrastructure & Auth |
 | **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `f1c5edf` — fix(auth): address D1.11 review findings |
+| **Last Commit** | `8ef638b` — feat(users): add GET /users/me, POST /users, GET /users endpoints |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -43,7 +43,7 @@
 | D1.9 — `POST /auth/logout` | ✅ | `5c67f75` |
 | D1.10 — `user_sessions` table + repository | ✅ | `aba6762` |
 | D1.11 — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard) | ✅ | `79977fd` |
-| D1.12 — `GET /users/me`, `POST /users`, `GET /users` (admin) | ⬜ TODO | — |
+| D1.12 — `GET /users/me`, `POST /users`, `GET /users` (admin) | ✅ | `8ef638b` |
 | D1.13–D1.17 — i18n module | ⬜ TODO | — |
 
 ### Phase 2 — Database Layer & Repository Pattern
@@ -98,7 +98,7 @@
 
 ## Next Task
 
-> **D1.12** — `GET /users/me`, `POST /users`, `GET /users` (admin)
+> **D1.13** — i18n: `src/i18n/` structure — locale detector, resource loader, `t()` function
 
 ---
 
@@ -111,17 +111,13 @@
 - GitHub push failed (no credentials). PR must be created manually.
 - Phase 1 started from current state (all Phase 0.B code is on `main`-equivalent branch).
 - D1.8 complete: `POST /auth/refresh` with full ADR-004 token rotation + reuse detection. 15 tests pass.
-  - 5 new integration tests: normal rotation, reuse detection, invalid/expired/revoked tokens
-  - Schema migration `0001_add_refresh_replaced_by.sql` for `user_sessions.refresh_replaced_by` column
-- D1.9 complete: `POST /auth/logout` with session revocation. Idempotent (already-revoked → 200). 21 tests pass overall.
-  - 6 new integration tests: valid revocation, idempotent, invalid token, orphan token, expired token, multi-session isolation
-- D1.11 complete: Auth middleware chain with 19 integration tests (41 tests pass overall).
-  - CORS, Helmet (CSP + HSTS), Rate Limiter plugins registered in `buildApp()`
-  - JWT verifier decorator (`app.authenticate`) with user status check
-  - RBAC guard (`requireRole()`) for admin/operator/user/readonly roles
-  - RFC 7807 error format via `src/shared/errors.ts` helper
-  - Adapter interface decoupling: `AppDependencies` + repositories use `DatabaseAdapter`
-  - Logout route now protected by `app.authenticate` with sub-claim verification
+- D1.9 complete: `POST /auth/logout` with session revocation. Idempotent. 21 tests pass overall.
+- D1.11 complete: Auth middleware chain with 19 integration tests. RFC 7807 errors, adapter decoupling, logout protected.
+- D1.12 complete: User endpoints (GET /users/me, POST /users, GET /users) with 13 integration tests. 54 tests pass overall.
+  - Password hashes stripped from all responses
+  - Admin-only routes (`POST /users`, `GET /users`) use `requireRole('admin')`
+  - JSON Schema validation with `maxLength` and `minLength` constraints
+  - Duplicate callsign detection returns 409
 
 ---
 
@@ -135,6 +131,7 @@
 | 2026-08-03 | Session 3 | D1.8 — refresh token rotation with reuse detection |
 | 2026-08-03 | Session 4 | D1.9 — logout endpoint with session revocation (6 tests) |
 | 2026-08-03 | Session 5 | D1.11 — auth middleware chain (18 tests) |
+| 2026-08-03 | Session 6 | D1.12 — user endpoints (13 tests) |
 
 ---
 
