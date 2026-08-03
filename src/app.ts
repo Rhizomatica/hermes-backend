@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import { healthRoutes } from '@api/v1/health.js';
 import { loginRoutes } from '@api/v1/auth/login.js';
 import { refreshRoutes } from '@api/v1/auth/refresh.js';
+import { logoutRoutes } from '@api/v1/auth/logout.js';
 import { TokenService } from '@auth/token.js';
 import { UsersRepository } from '@db/repositories/users.repository.js';
 import { SessionsRepository } from '@db/repositories/sessions.repository.js';
@@ -39,6 +40,7 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
 
   loginRoutes(app);
   refreshRoutes(app);
+  logoutRoutes(app);
 
   return app;
 }
