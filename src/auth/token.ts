@@ -8,6 +8,7 @@ export interface TokenPayload {
   callsign: string;
   role: string;
   locale: string;
+  iss: string;
   iat: number;
   exp: number;
 }
@@ -16,6 +17,7 @@ export interface RefreshTokenPayload {
   sub: string;
   type: string;
   jti: string;
+  iss: string;
   iat: number;
   exp: number;
 }
@@ -25,6 +27,7 @@ export class TokenService {
   private readonly publicKey: string;
   private readonly accessExpiresIn: number;
   private readonly refreshExpiresIn: number;
+  private readonly issuer: string;
 
   constructor(
     config: Pick<AppConfig, 'jwtPrivateKeyPath' | 'jwtPublicKeyPath' | 'jwtAccessExpiresIn' | 'jwtRefreshExpiresIn'>,
@@ -33,17 +36,22 @@ export class TokenService {
     this.publicKey = readFileSync(config.jwtPublicKeyPath, 'utf8');
     this.accessExpiresIn = config.jwtAccessExpiresIn;
     this.refreshExpiresIn = config.jwtRefreshExpiresIn;
+    this.issuer = 'hermes-backend';
   }
 
-  signAccessToken(payload: Omit<TokenPayload, 'iat' | 'exp'>): string {
+  signAccessToken(payload: Omit<TokenPayload, 'iat' | 'exp' | 'iss'>): string {
     const now = Math.floor(Date.now() / 1000);
-    return jwt.sign({ ...payload, iat: now, exp: now + this.accessExpiresIn }, this.privateKey, { algorithm: 'RS256' });
+    return jwt.sign(
+      { ...payload, iss: this.issuer, iat: now, exp: now + this.accessExpiresIn },
+      this.privateKey,
+      { algorithm: 'RS256' },
+    );
   }
 
   signRefreshToken(sub: string): string {
     const now = Math.floor(Date.now() / 1000);
     return jwt.sign(
-      { sub, type: 'refresh', jti: randomUUID(), iat: now, exp: now + this.refreshExpiresIn },
+      { sub, type: 'refresh', jti: randomUUID(), iss: this.issuer, iat: now, exp: now + this.refreshExpiresIn },
       this.privateKey,
       { algorithm: 'RS256' },
     );

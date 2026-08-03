@@ -39,7 +39,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
           radio: 'disconnected',
           clock_synced: true,
         },
-        version: '0.1.0',
+        version: app.config.version,
         timestamp: new Date().toISOString(),
       };
     },

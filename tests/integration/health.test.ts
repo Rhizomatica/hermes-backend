@@ -1,31 +1,16 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { buildApp } from '../../src/app.js';
-import { SQLiteAdapter } from '../../src/db/sqlite.adapter.js';
-import type { AppConfig } from '../../src/shared/config.js';
+import { createTestApp } from '../helpers/test-setup.js';
 import type { FastifyInstance } from 'fastify';
-
-const testConfig: AppConfig = {
-  databasePath: ':memory:',
-  port: 0,
-  host: '127.0.0.1',
-  corsOrigins: '*',
-  logLevel: 'silent',
-  radioDriver: 'simulated',
-  dbAdapter: 'sqlite',
-  jwtPrivateKeyPath: '/tmp/test-private.pem',
-  jwtPublicKeyPath: '/tmp/test-public.pem',
-  jwtAccessExpiresIn: 900,
-  jwtRefreshExpiresIn: 604800,
-};
+import type { SQLiteAdapter } from '../../src/db/sqlite.adapter.js';
 
 describe('Health Endpoints', () => {
   let app: FastifyInstance;
   let adapter: SQLiteAdapter;
 
   beforeAll(async () => {
-    adapter = new SQLiteAdapter(':memory:');
-    app = await buildApp({ config: testConfig, adapter });
-    await app.listen({ port: 0, host: '127.0.0.1' });
+    const ctx = await createTestApp();
+    app = ctx.app;
+    adapter = ctx.adapter;
   });
 
   afterAll(async () => {
@@ -47,7 +32,7 @@ describe('Health Endpoints', () => {
     expect(body.status).toBe('ok');
     expect(body.checks.database).toBe('ok');
     expect(body.checks.radio).toBe('disconnected');
-    expect(body.version).toBe('0.1.0');
+    expect(body.version).toBe('0.0.0-test');
     expect(typeof body.uptime).toBe('number');
     expect(typeof body.timestamp).toBe('string');
   });

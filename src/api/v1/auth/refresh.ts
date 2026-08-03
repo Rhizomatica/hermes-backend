@@ -1,6 +1,3 @@
-import { SessionsRepository } from '@db/repositories/sessions.repository.js';
-import { UsersRepository } from '@db/repositories/users.repository.js';
-import { TokenService } from '@auth/token.js';
 import { refreshRequestSchema } from './refresh.schema.js';
 import type { FastifyInstance } from 'fastify';
 
@@ -26,12 +23,11 @@ export function refreshRoutes(app: FastifyInstance): void {
   }, async (request, reply) => {
     const { refreshToken } = request.body as { refreshToken: string };
 
-    const tokenSvc = new TokenService(app.config);
-    const sessions = new SessionsRepository(app.adapter);
+    const { token, sessions, users } = app.services;
 
     // 1. Verify JWT signature and expiry
     try {
-      tokenSvc.verifyRefreshToken(refreshToken);
+      token.verifyRefreshToken(refreshToken);
     } catch {
       return reply.code(401).send({ error: 'auth.invalid_refresh_token' });
     }
@@ -47,6 +43,7 @@ export function refreshRoutes(app: FastifyInstance): void {
     if (session.refreshReplacedBy) {
       // Revoke ALL sessions for this user per ADR-004
       await sessions.revokeAllForUser(session.userId);
+      // TODO: D2.10 — write to audit_logs table (refresh_token_reuse_detected)
       app.log.warn({ userId: session.userId }, 'Refresh token reuse detected — all sessions revoked');
       return reply.code(401).send({ error: 'auth.token_reuse_detected' });
     }
@@ -61,26 +58,25 @@ export function refreshRoutes(app: FastifyInstance): void {
     }
 
     // 5. Fetch user to get claims for new access token
-    const users = new UsersRepository(app.adapter);
     const user = await users.findById(session.userId);
     if (!user || user.status !== 'active') {
       return reply.code(401).send({ error: 'auth.account_inactive' });
     }
 
     // 6. Issue new token pair
-    const newAccessToken = tokenSvc.signAccessToken({
+    const newAccessToken = token.signAccessToken({
       sub: user.id,
       callsign: user.callsign,
       role: user.role,
       locale: user.locale,
     });
-    const newRefreshToken = tokenSvc.signRefreshToken(user.id);
+    const newRefreshToken = token.signRefreshToken(user.id);
 
     const newExpiresAt = new Date(Date.now() + app.config.jwtRefreshExpiresIn * 1000).toISOString();
 
     // 7. Atomic rotation: mark old as replaced, insert new session
     try {
-      await sessions.createAndReplace(session.id, {
+      sessions.createAndReplace(session.id, {
         userId: user.id,
         refreshToken: newRefreshToken,
         expiresAt: newExpiresAt,
