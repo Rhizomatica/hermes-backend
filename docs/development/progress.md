@@ -8,9 +8,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Phase** | 0.B — Tooling Setup |
-| **Branch** | `feat/phase-0b-tooling` |
-| **Last Commit** | `3163eb0` — feat(db): add DatabaseAdapter interface and SQLiteAdapter implementation |
+| **Phase** | 1 — Core Infrastructure & Auth |
+| **Branch** | `feat/phase-1-core-infra` |
+| **Last Commit** | `e8cdc2d` — feat(core): Fastify server, health endpoints, SQLite WAL, config loader |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -25,13 +25,26 @@
 | D0.B.1 — Initialize repo (`package.json`, `tsconfig.json`, ESLint, Prettier, Vitest) | ✅ | `91452aa` |
 | D0.B.2 — Set up Drizzle ORM with SQLite adapter, initial migration | ✅ | `8363247` |
 | D0.B.3 — Create `DatabaseAdapter` interface + `SQLiteAdapter` implementation | ✅ | `3163eb0` |
-| Quality Gate — `npm test` (empty suite), `npm run build` (zero TS errors) | ✅ | `3163eb0` |
+| Quality Gate — `npm test`, `npm run build`, migration against `:memory:` | ✅ | `3163eb0` |
+| Review fixes — prune deps, drop baseUrl, vite-tsconfig-paths, meaningful test | ✅ | `02651b1` |
 
 ### Phase 1 — Core Infrastructure & Auth
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D1.1–D1.17) | ⬜ BLOCKED (Phase 0.B not complete) | — |
+| D1.1 — Fastify v5 server with health endpoint (`GET /health`, `GET /health/deep`) | ✅ | `e8cdc2d` |
+| D1.2 — SQLite connection with WAL PRAGMAs | ✅ | `e8cdc2d` |
+| D1.3 — Configuration loader (`src/shared/config.ts`) | ✅ | `e8cdc2d` |
+| D1.4 — `users` table + repository (Drizzle) | 🔄 | — |
+| D1.5 — Password hashing (bcrypt, cost ≥ 12) | ⬜ TODO | — |
+| D1.6 — JWT RS256 key pair generation + sign/verify utilities | ⬜ TODO | — |
+| D1.7 — `POST /auth/login` | ⬜ TODO | — |
+| D1.8 — `POST /auth/refresh` | ⬜ TODO | — |
+| D1.9 — `POST /auth/logout` | ⬜ TODO | — |
+| D1.10 — `user_sessions` table + repository | ⬜ TODO | — |
+| D1.11 — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard) | ⬜ TODO | — |
+| D1.12 — `GET /users/me`, `POST /users`, `GET /users` (admin) | ⬜ TODO | — |
+| D1.13–D1.17 — i18n module | ⬜ TODO | — |
 
 ### Phase 2 — Database Layer & Repository Pattern
 
@@ -85,20 +98,18 @@
 
 ## Next Task
 
-> **Phase 1, D1.1** — Fastify v5 server with health endpoint (`GET /health`, `GET /health/deep`)
-
-**Phase 0.B is complete.** The branch `feat/phase-0b-tooling` is ready for PR. After merge, create branch `feat/phase-1-core-infra` and begin Phase 1.
+> **D1.4** — `users` table + repository (Drizzle) — currently in progress
 
 ---
 
 ## Notes & Blockers
 
-- Phase 0.B is complete. All quality gates pass:
+- Phase 0.B is complete with all review fixes applied (7 commits on `feat/phase-0b-tooling`).
   - `npm run build` — zero TypeScript errors
-  - `npm test` — 1 test passes (placeholder)
-  - Migration against `:memory:` — users table with 13 columns, 5 indexes
-- Branch `feat/phase-0b-tooling` ready for PR.
-- After merge, start Phase 1 on branch `feat/phase-1-core-infra`.
+  - `npm test` — 2 tests pass (SQLiteAdapter health check + graceful close)
+  - Migration against `:memory:` — users table with 13 columns, 6 indexes
+- GitHub push failed (no credentials). PR must be created manually.
+- Phase 1 started from current state (all Phase 0.B code is on `main`-equivalent branch).
 
 ---
 
@@ -107,6 +118,8 @@
 | Date | Session | Tasks Completed |
 |------|---------|----------------|
 | 2026-07-30 | Session 1 | D0.B.1, D0.B.2, D0.B.3, Quality Gate |
+| 2026-07-30 | Session 1b | Review fixes: prune deps, drop baseUrl, vite-tsconfig-paths, meaningful test |
+| 2026-08-03 | Session 2 | Starting Phase 1 |
 
 ---
 
