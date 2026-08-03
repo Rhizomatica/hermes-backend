@@ -38,3 +38,5 @@ drizzle/meta/
 # Temporary files
 tmp/
 temp/
+keys/private.pem
+keys/public.pem

@@ -26,17 +26,22 @@ cd hermes-backend
 # 2. Install dependencies
 npm install
 
-# 3. Set up environment
+# 3. Generate JWT RS256 key pair (required for authentication)
+mkdir -p keys
+openssl genrsa -out keys/private.pem 2048
+openssl rsa -in keys/private.pem -pubout -out keys/public.pem
+
+# 4. Set up environment
 cp .env.example .env
 # Edit .env — adjust DATABASE_PATH, RADIO_DRIVER=simulated, etc.
 
-# 4. Run database migrations
+# 5. Run database migrations
 npm run db:migrate
 
-# 5. Start development server (hot-reload)
+# 6. Start development server (hot-reload)
 npm run dev
 
-# 6. Verify the server is running
+# 7. Verify the server is running
 curl http://localhost:3000/health
 ```
 
@@ -182,6 +187,61 @@ sqlite3 data/hermes.sqlite
 sqlite> .tables
 sqlite> .schema conversations
 ```
+
+## JWT Authentication Keys
+
+The server requires an **RSA 2048-bit key pair** for JWT RS256 token signing and verification. These are generated per station and **never committed** to the repository.
+
+### Key File Locations
+
+| File | Purpose | Security |
+|------|---------|----------|
+| `keys/private.pem` | Signs JWT access and refresh tokens | 🔒 Must stay on the server — never commit, never share |
+| `keys/public.pem` | Verifies JWT tokens on every API request | ✅ Can be freely distributed |
+
+### Generation
+
+```bash
+mkdir -p keys
+openssl genrsa -out keys/private.pem 2048
+openssl rsa -in keys/private.pem -pubout -out keys/public.pem
+```
+
+### Key Rotation
+
+To rotate keys (invalidating all existing tokens per ADR-004):
+
+```bash
+# 1. Generate new keys
+openssl genrsa -out keys/private.pem.new 2048
+openssl rsa -in keys/private.pem.new -pubout -out keys/public.pem.new
+
+# 2. Replace old keys
+mv keys/private.pem.new keys/private.pem
+mv keys/public.pem.new keys/public.pem
+
+# 3. Restart the server
+npm run dev
+```
+
+All previously issued JWT tokens become invalid — clients must re-authenticate.
+
+### How They Work
+
+```
+┌─────────────────┐                    ┌─────────────────┐
+│  POST /auth/login │                   │  GET /users/me   │
+│  (private.pem)   │                   │  (public.pem)    │
+└────────┬────────┘                   └────────┬────────┘
+         │ Sign JWT                             │ Verify JWT
+         ▼                                      ▼
+┌─────────────────┐                   ┌─────────────────┐
+│ accessToken:     │                  │ Authorization:    │
+│ eyJhbGciOiJSU... │ ───────────────► │ Bearer <token>    │
+└─────────────────┘                   └─────────────────┘
+```
+
+See `src/auth/token.ts` for the `TokenService` implementation and ADR-004 for the token rotation architecture.
 
 ## Simulated Radio Driver
 
