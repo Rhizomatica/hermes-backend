@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 1 — Core Infrastructure & Auth |
 | **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `79977fd` — feat(auth): add middleware chain (CORS, Helmet, Rate Limiter, JWT Verifier, RBAC Guard) |
+| **Last Commit** | `f1c5edf` — fix(auth): address D1.11 review findings |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -115,10 +115,13 @@
   - Schema migration `0001_add_refresh_replaced_by.sql` for `user_sessions.refresh_replaced_by` column
 - D1.9 complete: `POST /auth/logout` with session revocation. Idempotent (already-revoked → 200). 21 tests pass overall.
   - 6 new integration tests: valid revocation, idempotent, invalid token, orphan token, expired token, multi-session isolation
-- D1.11 complete: Auth middleware chain with 18 new integration tests. 39 tests pass overall.
+- D1.11 complete: Auth middleware chain with 19 integration tests (41 tests pass overall).
   - CORS, Helmet (CSP + HSTS), Rate Limiter plugins registered in `buildApp()`
   - JWT verifier decorator (`app.authenticate`) with user status check
   - RBAC guard (`requireRole()`) for admin/operator/user/readonly roles
+  - RFC 7807 error format via `src/shared/errors.ts` helper
+  - Adapter interface decoupling: `AppDependencies` + repositories use `DatabaseAdapter`
+  - Logout route now protected by `app.authenticate` with sub-claim verification
 
 ---
 
