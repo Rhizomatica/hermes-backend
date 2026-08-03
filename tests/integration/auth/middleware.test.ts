@@ -7,6 +7,19 @@ import type { FastifyInstance } from 'fastify';
 import type { SQLiteAdapter } from '../../../src/db/sqlite.adapter.js';
 import { SQLiteAdapter as SqliteAdapterClass } from '../../../src/db/sqlite.adapter.js';
 
+interface ErrorBody {
+  type: string;
+  title: string;
+  status: number;
+  code: string;
+  message: string;
+}
+
+interface OkBody {
+  ok: boolean;
+  role?: string;
+}
+
 describe('Auth Middleware Chain', () => {
   let app: FastifyInstance;
   let adapter: SQLiteAdapter;
@@ -89,9 +102,12 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(401);
-      const body = response.json<{ error: string; code: string }>();
-      expect(body.error).toBe('auth.missing_token');
+      const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
+      expect(body.message).toBe('Missing access token');
+      expect(body.type).toContain('hermes.example.com/errors/unauthenticated');
+      expect(body.title).toBe('Unauthorized');
+      expect(body.status).toBe(401);
     });
 
     it('should return 401 when Authorization header is not Bearer', async () => {
@@ -102,9 +118,9 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(401);
-      const body = response.json<{ error: string; code: string }>();
-      expect(body.error).toBe('auth.invalid_token');
+      const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
+      expect(body.message).toBe('Invalid access token');
     });
 
     it('should return 401 for invalid/malformed token', async () => {
@@ -115,8 +131,41 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(401);
-      const body = response.json<{ error: string; code: string }>();
+      const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('should return 401 for an expired token', async () => {
+      // Create a token that has already expired using the app's own key pair
+      const now = Math.floor(Date.now() / 1000);
+      const jwt = await import('jsonwebtoken');
+      const { readFileSync } = await import('node:fs');
+      const privateKey = readFileSync(app.config.jwtPrivateKeyPath, 'utf8');
+
+      const expiredToken = jwt.default.sign(
+        {
+          sub: '00000000-0000-0000-0000-000000000000',
+          callsign: 'XA0EXP',
+          role: 'user',
+          locale: 'en',
+          iss: 'hermes-backend',
+          iat: now - 120,
+          exp: now - 60,
+        },
+        privateKey,
+        { algorithm: 'RS256' },
+      );
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/test-protected',
+        headers: { authorization: `Bearer ${expiredToken}` },
+      });
+
+      expect(response.statusCode).toBe(401);
+      const body = response.json<ErrorBody>();
+      expect(body.code).toBe('TOKEN_EXPIRED');
+      expect(body.message).toBe('Access token has expired');
     });
 
     it('should return 401 when token is for a non-existent user', async () => {
@@ -134,7 +183,7 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(401);
-      const body = response.json<{ error: string; code: string }>();
+      const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
     });
 
@@ -148,7 +197,7 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json<{ ok: boolean }>().ok).toBe(true);
+      expect(response.json<OkBody>().ok).toBe(true);
     });
 
     it('should return 401 when user is suspended', async () => {
@@ -164,7 +213,7 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(401);
-      const body = response.json<{ error: string; code: string }>();
+      const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
     });
   });
@@ -180,9 +229,12 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(403);
-      const body = response.json<{ error: string; code: string }>();
+      const body = response.json<ErrorBody>();
       expect(body.code).toBe('FORBIDDEN');
-      expect(body.error).toBe('auth.forbidden');
+      expect(body.message).toBe('Insufficient permissions for this operation');
+      expect(body.type).toContain('hermes.example.com/errors/forbidden');
+      expect(body.title).toBe('Forbidden');
+      expect(body.status).toBe(403);
     });
 
     it('should allow admin to access admin-only route', async () => {
@@ -195,7 +247,7 @@ describe('Auth Middleware Chain', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json<{ role: string }>().role).toBe('admin');
+      expect(response.json<OkBody>().role).toBe('admin');
     });
 
     it('should allow operator to access operator+ route', async () => {

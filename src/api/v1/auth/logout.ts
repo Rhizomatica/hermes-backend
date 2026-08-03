@@ -1,11 +1,10 @@
 import { logoutRequestSchema } from './logout.schema.js';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 export function logoutRoutes(app: FastifyInstance): void {
   app.post('/auth/logout', {
+    preHandler: [app.authenticate],
     schema: {
-      description: 'Logout and revoke the current refresh token session',
-      tags: ['auth'],
       body: logoutRequestSchema,
       response: {
         200: {
@@ -17,27 +16,31 @@ export function logoutRoutes(app: FastifyInstance): void {
         401: { type: 'object', properties: { error: { type: 'string' } } },
       },
     },
-  }, async (request, reply) => {
+  }, async (request: FastifyRequest, reply) => {
     const { refreshToken } = request.body as { refreshToken: string };
-
     const { token, sessions } = app.services;
 
-    // 1. Verify JWT signature and expiry — reject malformed/expired tokens
+    // Verify the refresh token is a well-formed JWT
+    let refreshPayload: { sub: string };
     try {
-      token.verifyRefreshToken(refreshToken);
+      refreshPayload = token.verifyRefreshToken(refreshToken) as unknown as { sub: string };
     } catch {
       return reply.code(401).send({ error: 'auth.invalid_refresh_token' });
     }
 
-    // 2. Find the session by token hash
-    const session = await sessions.findByTokenHash(refreshToken);
-
-    if (!session) {
-      // Token not in any session — already revoked or never existed
+    // Verify the refresh token belongs to the authenticated user
+    if (refreshPayload.sub !== request.user.sub) {
       return reply.code(401).send({ error: 'auth.invalid_refresh_token' });
     }
 
-    // 3. Revoke the session (idempotent: if already revoked, no-op)
+    // Find and revoke the session
+    const session = await sessions.findByTokenHash(refreshToken);
+    if (!session) {
+      // Token not in any session — already revoked or never existed
+      // Idempotent: return 200 — the caller's session is effectively gone
+      return reply.status(200).send({ message: 'auth.logged_out' });
+    }
+
     if (!session.revokedAt) {
       await sessions.revoke(session.id);
     }

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { and, eq, isNull } from 'drizzle-orm';
 import { userSessions } from '../../db/schema/user-sessions.js';
-import type { SQLiteAdapter } from '../../db/sqlite.adapter.js';
+import type { DatabaseAdapter } from '../../db/adapter.js';
 
 export interface SessionRow {
   id: string;
@@ -21,7 +21,7 @@ function hashToken(token: string): string {
 }
 
 export class SessionsRepository {
-  constructor(private readonly adapter: SQLiteAdapter) {}
+  constructor(private readonly adapter: DatabaseAdapter) {}
 
   async create(session: {
     userId: string;

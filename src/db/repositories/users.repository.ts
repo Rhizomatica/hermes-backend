@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { users } from '../../db/schema/users.js';
-import type { SQLiteAdapter } from '../../db/sqlite.adapter.js';
+import type { DatabaseAdapter } from '../../db/adapter.js';
 
 export interface UserRow {
   id: string;
@@ -30,7 +30,7 @@ function rowToUser(row: typeof users.$inferSelect): UserRow {
 }
 
 export class UsersRepository {
-  constructor(private readonly adapter: SQLiteAdapter) {}
+  constructor(private readonly adapter: DatabaseAdapter) {}
 
   async findByCallsign(callsign: string): Promise<UserRow | null> {
     const row = await this.adapter.db.select().from(users).where(eq(users.callsign, callsign)).get();

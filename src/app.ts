@@ -10,14 +10,13 @@ import { TokenService } from '@auth/token.js';
 import { UsersRepository } from '@db/repositories/users.repository.js';
 import { SessionsRepository } from '@db/repositories/sessions.repository.js';
 import { registerJwtVerifier } from '@auth/middleware/jwt-verifier.js';
-import { registerRbacGuard } from '@auth/middleware/rbac-guard.js';
 import type { AppConfig } from '@shared/config.js';
-import type { SQLiteAdapter } from '@db/sqlite.adapter.js';
+import type { DatabaseAdapter } from '@db/adapter.js';
 import type { FastifyInstance } from 'fastify';
 
 export interface AppDependencies {
   config: AppConfig;
-  adapter: SQLiteAdapter;
+  adapter: DatabaseAdapter;
 }
 
 export interface AppServices {
@@ -82,9 +81,6 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
   // JWT verifier decorator (app.authenticate)
   await registerJwtVerifier(app);
 
-  // RBAC guard (per-route preHandler via requireRole())
-  await registerRbacGuard(app);
-
   await app.register(healthRoutes);
 
   loginRoutes(app);
@@ -97,7 +93,7 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
 declare module 'fastify' {
   interface FastifyInstance {
     config: AppConfig;
-    adapter: SQLiteAdapter;
+    adapter: DatabaseAdapter;
     services: AppServices;
   }
 }

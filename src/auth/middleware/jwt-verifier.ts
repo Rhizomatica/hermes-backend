@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import type { TokenPayload } from '../token.js';
+import { sendError } from '../../shared/errors.js';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -15,29 +16,17 @@ export async function registerJwtVerifier(app: FastifyInstance): Promise<void> {
   app.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
-      return reply.code(401).send({
-        error: 'auth.missing_token',
-        code: 'UNAUTHENTICATED',
-        statusCode: 401,
-      });
+      return sendError(reply, 401, 'UNAUTHENTICATED', 'Missing access token');
     }
 
     const parts = authHeader.split(' ');
     if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return reply.code(401).send({
-        error: 'auth.invalid_token',
-        code: 'UNAUTHENTICATED',
-        statusCode: 401,
-      });
+      return sendError(reply, 401, 'UNAUTHENTICATED', 'Invalid access token');
     }
 
     const token = parts[1];
     if (!token) {
-      return reply.code(401).send({
-        error: 'auth.invalid_token',
-        code: 'UNAUTHENTICATED',
-        statusCode: 401,
-      });
+      return sendError(reply, 401, 'UNAUTHENTICATED', 'Invalid access token');
     }
 
     try {
@@ -46,28 +35,16 @@ export async function registerJwtVerifier(app: FastifyInstance): Promise<void> {
       // Verify user still exists and is active
       const user = await app.services.users.findById(payload.sub);
       if (!user || user.status !== 'active') {
-        return reply.code(401).send({
-          error: 'auth.invalid_token',
-          code: 'UNAUTHENTICATED',
-          statusCode: 401,
-        });
+        return sendError(reply, 401, 'UNAUTHENTICATED', 'Invalid access token');
       }
 
       request.user = payload;
     } catch (err) {
       const error = err as Error & { name?: string };
       if (error.name === 'TokenExpiredError') {
-        return reply.code(401).send({
-          error: 'auth.token_expired',
-          code: 'TOKEN_EXPIRED',
-          statusCode: 401,
-        });
+        return sendError(reply, 401, 'TOKEN_EXPIRED', 'Access token has expired');
       }
-      return reply.code(401).send({
-        error: 'auth.invalid_token',
-        code: 'UNAUTHENTICATED',
-        statusCode: 401,
-      });
+      return sendError(reply, 401, 'UNAUTHENTICATED', 'Invalid access token');
     }
   });
 }
