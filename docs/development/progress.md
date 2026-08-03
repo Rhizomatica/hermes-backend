@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 1 — Core Infrastructure & Auth |
 | **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `5c67f75` — feat(auth): add POST /auth/logout endpoint with session revocation |
+| **Last Commit** | `79977fd` — feat(auth): add middleware chain (CORS, Helmet, Rate Limiter, JWT Verifier, RBAC Guard) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -42,7 +42,7 @@
 | D1.8 — `POST /auth/refresh` — token rotation with reuse detection | ✅ | `54d4183` |
 | D1.9 — `POST /auth/logout` | ✅ | `5c67f75` |
 | D1.10 — `user_sessions` table + repository | ✅ | `aba6762` |
-| D1.11 — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard) | ⬜ TODO | — |
+| D1.11 — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard) | ✅ | `79977fd` |
 | D1.12 — `GET /users/me`, `POST /users`, `GET /users` (admin) | ⬜ TODO | — |
 | D1.13–D1.17 — i18n module | ⬜ TODO | — |
 
@@ -98,7 +98,7 @@
 
 ## Next Task
 
-> **D1.11** — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard)
+> **D1.12** — `GET /users/me`, `POST /users`, `GET /users` (admin)
 
 ---
 
@@ -115,6 +115,10 @@
   - Schema migration `0001_add_refresh_replaced_by.sql` for `user_sessions.refresh_replaced_by` column
 - D1.9 complete: `POST /auth/logout` with session revocation. Idempotent (already-revoked → 200). 21 tests pass overall.
   - 6 new integration tests: valid revocation, idempotent, invalid token, orphan token, expired token, multi-session isolation
+- D1.11 complete: Auth middleware chain with 18 new integration tests. 39 tests pass overall.
+  - CORS, Helmet (CSP + HSTS), Rate Limiter plugins registered in `buildApp()`
+  - JWT verifier decorator (`app.authenticate`) with user status check
+  - RBAC guard (`requireRole()`) for admin/operator/user/readonly roles
 
 ---
 
@@ -127,6 +131,7 @@
 | 2026-08-03 | Session 2 | D1.1-D1.7, D1.10, review fixes, dotenv/config fix |
 | 2026-08-03 | Session 3 | D1.8 — refresh token rotation with reuse detection |
 | 2026-08-03 | Session 4 | D1.9 — logout endpoint with session revocation (6 tests) |
+| 2026-08-03 | Session 5 | D1.11 — auth middleware chain (18 tests) |
 
 ---
 
