@@ -1,0 +1,1 @@
+ALTER TABLE `user_sessions` ADD `refresh_replaced_by` text;

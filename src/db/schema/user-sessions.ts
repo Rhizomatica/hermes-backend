@@ -12,6 +12,7 @@ export const userSessions = sqliteTable(
     userAgent: text('user_agent'),
     expiresAt: text('expires_at').notNull(),
     revokedAt: text('revoked_at'),
+    refreshReplacedBy: text('refresh_replaced_by'),
     createdAt: text('created_at').notNull(),
   },
   (table) => [

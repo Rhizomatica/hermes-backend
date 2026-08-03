@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import jwt from 'jsonwebtoken';
 import type { AppConfig } from '../shared/config.js';
@@ -7,6 +8,14 @@ export interface TokenPayload {
   callsign: string;
   role: string;
   locale: string;
+  iat: number;
+  exp: number;
+}
+
+export interface RefreshTokenPayload {
+  sub: string;
+  type: string;
+  jti: string;
   iat: number;
   exp: number;
 }
@@ -33,14 +42,18 @@ export class TokenService {
 
   signRefreshToken(sub: string): string {
     const now = Math.floor(Date.now() / 1000);
-    return jwt.sign({ sub, type: 'refresh', iat: now, exp: now + this.refreshExpiresIn }, this.privateKey, { algorithm: 'RS256' });
+    return jwt.sign(
+      { sub, type: 'refresh', jti: randomUUID(), iat: now, exp: now + this.refreshExpiresIn },
+      this.privateKey,
+      { algorithm: 'RS256' },
+    );
   }
 
   verifyAccessToken(token: string): TokenPayload {
     return jwt.verify(token, this.publicKey, { algorithms: ['RS256'] }) as TokenPayload;
   }
 
-  verifyRefreshToken(token: string): { sub: string; type: string } {
-    return jwt.verify(token, this.publicKey, { algorithms: ['RS256'] }) as { sub: string; type: string };
+  verifyRefreshToken(token: string): RefreshTokenPayload {
+    return jwt.verify(token, this.publicKey, { algorithms: ['RS256'] }) as RefreshTokenPayload;
   }
 }
