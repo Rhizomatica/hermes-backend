@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import jwt from 'jsonwebtoken';
-import type { AppConfig } from '../../shared/config.js';
+import type { AppConfig } from '../shared/config.js';
 
 export interface TokenPayload {
   sub: string;
