@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { loadConfig } from '@shared/config.js';
 import { SQLiteAdapter } from '@db/sqlite.adapter.js';
 import { buildApp } from './app.js';

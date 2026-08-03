@@ -17,12 +17,6 @@ export interface AppConfig {
   jwtRefreshExpiresIn: number;
 }
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing required environment variable: ${name}`);
-  return value;
-}
-
 function parseIntEnv(name: string, fallback: number): number {
   const value = process.env[name];
   if (!value) return fallback;
@@ -40,8 +34,8 @@ export function loadConfig(): AppConfig {
     logLevel: process.env['LOG_LEVEL'] ?? 'info',
     radioDriver: process.env['RADIO_DRIVER'] ?? 'simulated',
     dbAdapter: process.env['DB_ADAPTER'] ?? 'sqlite',
-    jwtPrivateKeyPath: requireEnv('JWT_PRIVATE_KEY_PATH'),
-    jwtPublicKeyPath: requireEnv('JWT_PUBLIC_KEY_PATH'),
+    jwtPrivateKeyPath: process.env['JWT_PRIVATE_KEY_PATH'] ?? './keys/private.pem',
+    jwtPublicKeyPath: process.env['JWT_PUBLIC_KEY_PATH'] ?? './keys/public.pem',
     jwtAccessExpiresIn: parseIntEnv('JWT_ACCESS_EXPIRES_IN', 900),
     jwtRefreshExpiresIn: parseIntEnv('JWT_REFRESH_EXPIRES_IN', 604_800),
   };
