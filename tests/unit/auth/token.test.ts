@@ -1,20 +1,13 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { execSync } from 'node:child_process';
+import { describe, it, expect } from 'vitest';
 import { TokenService } from '../../../src/auth/token.js';
-
-const PRIV = '/tmp/test-token-priv.pem';
-const PUB = '/tmp/test-token-pub.pem';
+import { getTestKeyPaths } from '../../helpers/test-setup.js';
 
 describe('Token Service', () => {
-  beforeAll(() => {
-    execSync(`openssl genrsa -out ${PRIV} 2048 2>/dev/null`);
-    execSync(`openssl rsa -in ${PRIV} -pubout -out ${PUB} 2>/dev/null`);
-  });
-
   function createService(accessExpiresIn = 900): TokenService {
+    const keys = getTestKeyPaths();
     return new TokenService({
-      jwtPrivateKeyPath: PRIV,
-      jwtPublicKeyPath: PUB,
+      jwtPrivateKeyPath: keys.privateKeyPath,
+      jwtPublicKeyPath: keys.publicKeyPath,
       jwtAccessExpiresIn: accessExpiresIn,
       jwtRefreshExpiresIn: 604800,
     });
@@ -33,6 +26,7 @@ describe('Token Service', () => {
     expect(p.callsign).toBe('XA1ABC');
     expect(p.role).toBe('user');
     expect(p.locale).toBe('en');
+    expect(p.iss).toBe('hermes-backend');
   });
 
   it('should sign and verify refresh token', () => {
@@ -41,6 +35,7 @@ describe('Token Service', () => {
     const p = svc.verifyRefreshToken(tok);
     expect(p.sub).toBe('u2');
     expect(p.type).toBe('refresh');
+    expect(p.iss).toBe('hermes-backend');
   });
 
   it('should reject expired access token', () => {

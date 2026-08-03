@@ -1,24 +1,31 @@
-import { execSync } from 'node:child_process';
+import { generateKeyPairSync, randomUUID } from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { SQLiteAdapter } from '../../src/db/sqlite.adapter.js';
 import { buildApp } from '../../src/app.js';
 import type { AppConfig } from '../../src/shared/config.js';
 import type { FastifyInstance } from 'fastify';
 
-const PRIV = '/tmp/test-hermes-priv.pem';
-const PUB = '/tmp/test-hermes-pub.pem';
+const KEY_DIR = join(tmpdir(), 'hermes-test-keys');
 
-let keysGenerated = false;
+function ensureKeys(): { privateKeyPath: string; publicKeyPath: string } {
+  mkdirSync(KEY_DIR, { recursive: true });
+  const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+  });
 
-function ensureKeys(): void {
-  if (keysGenerated) return;
-  execSync(`openssl genrsa -out ${PRIV} 2048 2>/dev/null`);
-  execSync(`openssl rsa -in ${PRIV} -pubout -out ${PUB} 2>/dev/null`);
-  keysGenerated = true;
+  const prefix = `${KEY_DIR}/test-${randomUUID().slice(0, 8)}`;
+  writeFileSync(`${prefix}-priv.pem`, privateKey, { mode: 0o600 });
+  writeFileSync(`${prefix}-pub.pem`, publicKey);
+
+  return { privateKeyPath: `${prefix}-priv.pem`, publicKeyPath: `${prefix}-pub.pem` };
 }
 
 export function getTestKeyPaths(): { privateKeyPath: string; publicKeyPath: string } {
-  ensureKeys();
-  return { privateKeyPath: PRIV, publicKeyPath: PUB };
+  return ensureKeys();
 }
 
 export function createTestConfig(overrides?: Partial<AppConfig>): AppConfig {
@@ -90,7 +97,6 @@ export interface TestAppContext {
 }
 
 export async function createTestApp(overrides?: Partial<AppConfig>): Promise<TestAppContext> {
-  ensureKeys();
   const config = createTestConfig(overrides);
   const adapter = new SQLiteAdapter(':memory:');
   const app = await buildApp({ config, adapter });
