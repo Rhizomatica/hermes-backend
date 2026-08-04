@@ -1,7 +1,7 @@
 import type { FastifyReply } from 'fastify';
 import type { FastifyRequest } from 'fastify';
 import { t } from '../i18n/index.js';
-import type { Locale, TranslationParams } from '../i18n/types.js';
+import type { Locale, TranslationKey, TranslationParams } from '../i18n/types.js';
 
 /**
  * Standardized error response helper following RFC 7807 Problem Detail format.
@@ -23,7 +23,7 @@ export function sendError(
   reply: FastifyReply,
   status: number,
   code: string,
-  i18nKey: string,
+  i18nKey: TranslationKey,
   params?: TranslationParams,
   details?: Array<{ field: string; message: string }>,
 ): void {

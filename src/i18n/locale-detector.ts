@@ -81,8 +81,9 @@ export function parseAcceptLanguage(header: string): Locale | null {
 function mapToSupportedLocale(tag: string): Locale | null {
   const lower = tag.toLowerCase();
 
-  // pt-BR is special — keep as literal match since it's a compound locale code
-  if (lower === 'pt-br' || lower === 'pt_br' || lower.startsWith('pt')) {
+  // pt-BR is special — keep as literal match since it's a compound locale code.
+  // Use startsWith('pt-') to avoid greedily matching non-Portuguese tags.
+  if (lower === 'pt-br' || lower === 'pt_br' || lower === 'pt' || lower.startsWith('pt-')) {
     return 'pt-BR';
   }
 

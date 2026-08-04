@@ -69,7 +69,7 @@ const resources: Record<Locale, Record<string, string>> = {
  */
 export function t(
   locale: Locale,
-  key: TranslationKey,
+  key: string,
   params?: TranslationParams,
 ): string {
   // Look up translation: requested locale → English fallback → raw key

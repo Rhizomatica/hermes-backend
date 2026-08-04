@@ -91,7 +91,16 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
   app.decorateRequest('locale', 'en' as Locale);
 
   // Locale middleware — runs before every request, detects locale from Accept-Language header.
-  // JWT-based locale detection is handled in Phase 3 (D3.12).
+  //
+  // TODO D3.12: Also detect locale from the JWT Bearer token's `locale` claim.
+  // The JWT decode must happen here (onRequest) since `app.authenticate` runs later
+  // as a preHandler. Use app.services.token.verifyAccessToken() to extract payload.locale,
+  // then pass it to detectLocale({ userLocale: payload.locale, ... }).
+  // Per docs/development/plan.md D3.12, the resolution chain should be:
+  //   JWT locale claim → Accept-Language header → 'en' fallback.
+  //
+  // Note: verifyAccessToken may throw for expired tokens — catch and fall through
+  // to Accept-Language. Expired-token locale is still valid for error messages.
   app.addHook('onRequest', (request: FastifyRequest) => {
     const acceptLanguage = request.headers['accept-language'];
     const acceptLanguageStr = typeof acceptLanguage === 'string' ? acceptLanguage : undefined;
