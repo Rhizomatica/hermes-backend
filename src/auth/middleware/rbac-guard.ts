@@ -16,11 +16,11 @@ export function requireRole(...allowedRoles: Role[]): preHandlerHookHandler {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     const { user } = request;
     if (!user) {
-      return sendError(reply, 401, 'UNAUTHENTICATED', 'Authentication required');
+      return sendError(reply, 401, 'UNAUTHENTICATED', 'AUTHENTICATION_REQUIRED');
     }
 
     if (!allowedRoles.includes(user.role as Role)) {
-      return sendError(reply, 403, 'FORBIDDEN', 'Insufficient permissions for this operation');
+      return sendError(reply, 403, 'FORBIDDEN', 'INSUFFICIENT_PERMISSIONS');
     }
   };
 }

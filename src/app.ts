@@ -13,9 +13,11 @@ import { TokenService } from '@auth/token.js';
 import { UsersRepository } from '@db/repositories/users.repository.js';
 import { SessionsRepository } from '@db/repositories/sessions.repository.js';
 import { registerJwtVerifier } from '@auth/middleware/jwt-verifier.js';
+import { detectLocale } from '@i18n/locale-detector.js';
+import type { Locale } from '@i18n/types.js';
 import type { AppConfig } from '@shared/config.js';
 import type { DatabaseAdapter } from '@db/adapter.js';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 export interface AppDependencies {
   config: AppConfig;
@@ -84,6 +86,18 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
   // JWT verifier decorator (app.authenticate)
   await registerJwtVerifier(app);
 
+  // Decorate request with locale property (defaults to 'en').
+  // The locale is set by the onRequest hook below.
+  app.decorateRequest('locale', 'en' as Locale);
+
+  // Locale middleware — runs before every request, detects locale from Accept-Language header.
+  // JWT-based locale detection is handled in Phase 3 (D3.12).
+  app.addHook('onRequest', (request: FastifyRequest) => {
+    const acceptLanguage = request.headers['accept-language'];
+    const acceptLanguageStr = typeof acceptLanguage === 'string' ? acceptLanguage : undefined;
+    request.locale = detectLocale({ acceptLanguageHeader: acceptLanguageStr });
+  });
+
   await app.register(healthRoutes);
 
   loginRoutes(app);
@@ -98,6 +112,11 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
 }
 
 declare module 'fastify' {
+  interface FastifyRequest {
+    /** Resolved locale for the current request (set by onRequest hook). */
+    locale: Locale;
+  }
+
   interface FastifyInstance {
     config: AppConfig;
     adapter: DatabaseAdapter;

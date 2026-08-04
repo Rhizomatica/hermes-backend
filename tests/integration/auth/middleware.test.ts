@@ -104,7 +104,7 @@ describe('Auth Middleware Chain', () => {
       expect(response.statusCode).toBe(401);
       const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
-      expect(body.message).toBe('Missing access token');
+      expect(body.message).toBe('Missing access token.');
       expect(body.type).toContain('hermes.example.com/errors/unauthenticated');
       expect(body.title).toBe('Unauthorized');
       expect(body.status).toBe(401);
@@ -120,7 +120,7 @@ describe('Auth Middleware Chain', () => {
       expect(response.statusCode).toBe(401);
       const body = response.json<ErrorBody>();
       expect(body.code).toBe('UNAUTHENTICATED');
-      expect(body.message).toBe('Invalid access token');
+      expect(body.message).toBe('Invalid access token.');
     });
 
     it('should return 401 for invalid/malformed token', async () => {
@@ -165,7 +165,7 @@ describe('Auth Middleware Chain', () => {
       expect(response.statusCode).toBe(401);
       const body = response.json<ErrorBody>();
       expect(body.code).toBe('TOKEN_EXPIRED');
-      expect(body.message).toBe('Access token has expired');
+      expect(body.message).toBe('The access token has expired. Use the refresh token to obtain a new one.');
     });
 
     it('should return 401 when token is for a non-existent user', async () => {
@@ -231,7 +231,7 @@ describe('Auth Middleware Chain', () => {
       expect(response.statusCode).toBe(403);
       const body = response.json<ErrorBody>();
       expect(body.code).toBe('FORBIDDEN');
-      expect(body.message).toBe('Insufficient permissions for this operation');
+      expect(body.message).toBe('Insufficient permissions for this operation.');
       expect(body.type).toContain('hermes.example.com/errors/forbidden');
       expect(body.title).toBe('Forbidden');
       expect(body.status).toBe(403);

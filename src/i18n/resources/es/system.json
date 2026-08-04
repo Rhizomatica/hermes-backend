@@ -1,0 +1,9 @@
+{
+  "SYSTEM_HEALTH_OK": "Todos los sistemas operativos.",
+  "SYSTEM_HEALTH_DEGRADED": "Algunos sistemas están degradados. Revise los registros para más detalles.",
+  "SYSTEM_CLOCK_UNSYNCED": "El reloj del sistema no está sincronizado. Las marcas de tiempo pueden ser inexactas.",
+  "SYSTEM_CLOCK_SYNCED": "El reloj del sistema ha sido sincronizado.",
+  "SYSTEM_SHUTTING_DOWN": "El sistema se está apagando...",
+  "SYSTEM_REBOOTING": "El sistema se está reiniciando...",
+  "SYSTEM_RECOVERY_IN_PROGRESS": "Recuperación del sistema en progreso. Algunas funciones pueden no estar disponibles temporalmente."
+}

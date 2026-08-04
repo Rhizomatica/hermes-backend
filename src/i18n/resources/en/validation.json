@@ -1,0 +1,11 @@
+{
+  "VALIDATION_REQUIRED": "{{field}} is required.",
+  "VALIDATION_MIN_LENGTH": "{{field}} must be at least {{min}} characters.",
+  "VALIDATION_MAX_LENGTH": "{{field}} must be at most {{max}} characters.",
+  "VALIDATION_FORMAT": "{{field}} has an invalid format.",
+  "VALIDATION_EMAIL": "{{field}} must be a valid email address.",
+  "VALIDATION_CALLSIGN": "Callsign must be 3–7 alphanumeric characters, starting with a letter.",
+  "VALIDATION_PASSWORD_WEAK": "Password does not meet complexity requirements.",
+  "VALIDATION_PASSWORD_CONTAINS_CALLSIGN": "Password must not contain your callsign.",
+  "VALIDATION_LOCALE": "Locale must be one of: en, es, pt-BR."
+}

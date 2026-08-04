@@ -1,0 +1,11 @@
+{
+  "VALIDATION_REQUIRED": "{{field}} é obrigatório.",
+  "VALIDATION_MIN_LENGTH": "{{field}} deve ter pelo menos {{min}} caracteres.",
+  "VALIDATION_MAX_LENGTH": "{{field}} deve ter no máximo {{max}} caracteres.",
+  "VALIDATION_FORMAT": "{{field}} possui formato inválido.",
+  "VALIDATION_EMAIL": "{{field}} deve ser um endereço de email válido.",
+  "VALIDATION_CALLSIGN": "Indicativo deve ter de 3 a 7 caracteres alfanuméricos, começando com uma letra.",
+  "VALIDATION_PASSWORD_WEAK": "A senha não atende aos requisitos de complexidade.",
+  "VALIDATION_PASSWORD_CONTAINS_CALLSIGN": "A senha não deve conter seu indicativo.",
+  "VALIDATION_LOCALE": "O idioma deve ser um dos seguintes: en, es, pt-BR."
+}

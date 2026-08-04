@@ -1,0 +1,6 @@
+{
+  "EMAIL_NEW_MESSAGE_SUBJECT": "Nova mensagem de {{sender}}",
+  "EMAIL_PASSWORD_RECOVERY_SUBJECT": "Recuperação de senha para {{callsign}}",
+  "EMAIL_SECURITY_ALERT_SUBJECT": "Alerta de segurança — Estação Hermes {{station}}",
+  "EMAIL_SYSTEM_HEALTH_SUBJECT": "Relatório de saúde do sistema — {{station}}"
+}
