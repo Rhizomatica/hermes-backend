@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 1 — Core Infrastructure & Auth |
 | **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `8ef638b` — feat(users): add GET /users/me, POST /users, GET /users endpoints |
+| **Last Commit** | `ca2b948` — feat(i18n): add i18n core module with locale detection, translations, and resource files for en/es/pt-BR |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -44,13 +44,17 @@
 | D1.10 — `user_sessions` table + repository | ✅ | `aba6762` |
 | D1.11 — Auth middleware chain (CORS → Helmet → Rate Limiter → JWT Verifier → RBAC Guard) | ✅ | `79977fd` |
 | D1.12 — `GET /users/me`, `POST /users`, `GET /users` (admin) | ✅ | `8ef638b` |
-| D1.13–D1.17 — i18n module | ⬜ TODO | — |
+| D1.13 — i18n: `src/i18n/` structure — locale detector, resource loader, `t()` function | ✅ | `ca2b948` |
+| D1.14 — i18n: resource files `en/` — extract existing strings from codebase | ✅ | `ca2b948` |
+| D1.15 — i18n: resource files `es/` — complete Spanish translation | ✅ | `ca2b948` |
+| D1.16 — i18n: resource files `pt-BR/` — complete Portuguese (Brazil) translation | ✅ | `ca2b948` |
+| D1.17 — i18n: `locale` field in JWT payload + `users.locale` column | ✅ | `ca2b948` |
 
 ### Phase 2 — Database Layer & Repository Pattern
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D2.1–D2.16) | ⬜ BLOCKED (Phase 1 not complete) | — |
+| All tasks (D2.1–D2.16) | ⬜ READY | — |
 
 ### Phase 3 — HAL & Radio Integration
 
@@ -98,12 +102,14 @@
 
 ## Next Task
 
-> **D1.13** — i18n: `src/i18n/` structure — locale detector, resource loader, `t()` function
+> **Phase 1 Complete** — All tasks D1.1–D1.17 ✅. Next: Phase 2 — Database Layer & Repository Pattern (D2.1). Create branch `feat/phase-2-database` from `main` and begin.
 
 ---
 
 ## Notes & Blockers
 
+- D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains), locale detector, `t()` function with interpolation, `sendError()` i18n integration, `i18n:check` script. 96 tests pass (54 existing + 42 new unit tests).
+- Phase 1 is fully complete. All tasks D1.1–D1.17 ✅. Ready for Phase 2.
 - Phase 0.B is complete with all review fixes applied (7 commits on `feat/phase-0b-tooling`).
   - `npm run build` — zero TypeScript errors
   - `npm test` — 10 tests pass (SQLiteAdapter, health integration, password, token)
@@ -132,6 +138,7 @@
 | 2026-08-03 | Session 4 | D1.9 — logout endpoint with session revocation (6 tests) |
 | 2026-08-03 | Session 5 | D1.11 — auth middleware chain (18 tests) |
 | 2026-08-03 | Session 6 | D1.12 — user endpoints (13 tests) |
+| 2026-08-04 | Session 7 | D1.13–D1.17 — i18n module (18 resource files, 42 tests) |
 
 ---
 
