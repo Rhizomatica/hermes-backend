@@ -8,9 +8,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Phase** | 1 — Core Infrastructure & Auth |
-| **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `025b89c` — fix(i18n): apply review fixes — pt prefix, TranslationKey type safety, D3.12 migration comment |
+| **Phase** | 2 — Database Layer & Repository Pattern |
+| **Branch** | `feat/phase-2-database` |
+| **Last Commit** | `e3f0ed8` — chore(db): add Phase 2 migration for all 14 new tables (D2.13) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -55,19 +55,36 @@
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D2.1–D2.16) | ⬜ READY | — |
+| D2.1 — conversations table + repository | ✅ | `7b59eea` |
+| D2.2 — conversation_participants table + repository | ✅ | `e2e5c3a` |
+| D2.3 — messages table + repository (idempotency) | ✅ | `f581104` |
+| D2.3a — content_checksum column (AUDIT H-1) | ✅ | `f581104` |
+| D2.4 — message_deliveries table + repository | ✅ | `1a4f373` |
+| D2.5 — message_reactions table + repository | ✅ | `1a4f373` |
+| D2.6 — attachments table + repository | ✅ | `1a4f373` |
+| D2.7 — message_envelopes table + repository | ✅ | `1a4f373` |
+| D2.8 — radio_profiles + radio_sessions tables + repos | ✅ | `aa6b9f6` |
+| D2.9 — frequencies + connection_schedules tables + repos | ✅ | `aa6b9f6` |
+| D2.10 — audit_logs table + repository (immutable, append-only) | ✅ | `aa6b9f6` |
+| D2.11 — jobs table + repository (SQLite-backed queue) | ✅ | `aa6b9f6` |
+| user_devices table + repository | ✅ | `aa6b9f6` |
+| D2.12 — DatabaseAdapter interface for all repositories | ✅ | (inherent — all repos inject adapter) |
+| D2.13 — Migration pipeline (0002_add_phase2_tables.sql) | ✅ | `e3f0ed8` |
+| D2.14 — locale column on users (already exists from Phase 1) | ✅ | N/A (Phase 1) |
+| D2.15 — locale column on audit_logs | ✅ | `aa6b9f6` |
+| D2.16 — locale column on message_envelopes | ✅ | `aa6b9f6` |
 
 ### Phase 3 — HAL & Radio Integration
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D3.1–D3.16) | ⬜ BLOCKED (Phase 2 not complete) | — |
+| All tasks (D3.1–D3.16) | ⬜ READY | — |
 
 ### Phase 4 — Messaging & Conversations
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D4.0–D4.16) | ⬜ BLOCKED (Phase 2 not complete) | — |
+| All tasks (D4.0–D4.16) | ⬜ BLOCKED (Phase 3 not complete) | — |
 
 ### Phase 5 — WebSocket Gateway
 
@@ -103,29 +120,22 @@
 
 ## Next Task
 
-> **Phase 1 Complete** — All tasks D1.1–D1.17 ✅. Next: Phase 2 — Database Layer & Repository Pattern (D2.1). Create branch `feat/phase-2-database` from `main` and begin.
+> **Phase 2 Complete** — All tasks D2.1–D2.16 ✅ (14 tables, 14 repositories, 80 unit tests, migration). Next: Phase 3 — HAL & Radio Integration (D3.1). Create branch `feat/phase-3-hal-radio` from `main` and begin.
 
 ---
 
 ## Notes & Blockers
 
-- D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains), locale detector, `t()` function with interpolation, `sendError()` i18n integration, `i18n:check` script. 96 tests pass (54 existing + 42 new unit tests).
-- Architectural review completed (12 findings, 10 addressed, 2 deferred). P1-P2 fixes applied: pt prefix collision, TranslationKey union type, sendError signature, D3.12 migration comment.
-- Phase 1 is fully complete. All tasks D1.1–D1.17 ✅. Ready for Phase 2.
-- Phase 0.B is complete with all review fixes applied (7 commits on `feat/phase-0b-tooling`).
-  - `npm run build` — zero TypeScript errors
-  - `npm test` — 10 tests pass (SQLiteAdapter, health integration, password, token)
-  - Migration against `:memory:` — users table with 13 columns, 6 indexes
+- Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
+- 80 unit tests across 7 repository test files (all pass).
+- 176 total tests pass (80 unit + 96 integration).
+- `npm run build` — zero TypeScript errors.
+- `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
 - GitHub push failed (no credentials). PR must be created manually.
-- Phase 1 started from current state (all Phase 0.B code is on `main`-equivalent branch).
-- D1.8 complete: `POST /auth/refresh` with full ADR-004 token rotation + reuse detection. 15 tests pass.
-- D1.9 complete: `POST /auth/logout` with session revocation. Idempotent. 21 tests pass overall.
-- D1.11 complete: Auth middleware chain with 19 integration tests. RFC 7807 errors, adapter decoupling, logout protected.
-- D1.12 complete: User endpoints (GET /users/me, POST /users, GET /users) with 13 integration tests. 54 tests pass overall.
-  - Password hashes stripped from all responses
-  - Admin-only routes (`POST /users`, `GET /users`) use `requireRole('admin')`
-  - JSON Schema validation with `maxLength` and `minLength` constraints
-  - Duplicate callsign detection returns 409
+- D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains).
+- Architectural review completed (12 findings, 10 addressed, 2 deferred).
+- Phase 0.B is complete with all review fixes applied.
+- Phase 1 is fully complete. All tasks D1.1–D1.17 ✅.
 
 ---
 
@@ -142,6 +152,7 @@
 | 2026-08-03 | Session 6 | D1.12 — user endpoints (13 tests) |
 | 2026-08-04 | Session 7 | D1.13–D1.17 — i18n module (18 resource files, 42 tests) |
 | 2026-08-04 | Session 7b | Review fixes — pt prefix, TranslationKey type, D3.12 comment |
+| 2026-08-04 | Session 8 | Phase 2: D2.1–D2.16 — all 14 tables, 14 repositories, migration, 80 unit tests |
 
 ---
 
