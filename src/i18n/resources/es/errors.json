@@ -1,0 +1,16 @@
+{
+  "UNAUTHENTICATED": "No autenticado. Proporcione un token de acceso válido.",
+  "TOKEN_EXPIRED": "El token de acceso ha expirado. Utilice el token de actualización para obtener uno nuevo.",
+  "FORBIDDEN": "No tiene permisos suficientes para esta operación.",
+  "NOT_FOUND": "El recurso solicitado no fue encontrado: {{resourceType}}",
+  "CONFLICT": "Ya existe un recurso con los mismos identificadores.",
+  "RATE_LIMITED": "Demasiadas solicitudes. Intente nuevamente en {{retryAfter}} segundos.",
+  "INTERNAL_ERROR": "Error interno del servidor. Contacte al administrador si el problema persiste.",
+  "CONTENT_TOO_LARGE": "El contenido del mensaje excede el límite de {{maxSizeKB}} KB.",
+  "PARTICIPANT_LIMIT_EXCEEDED": "La conversación excedería el máximo de {{maxParticipants}} participantes.",
+  "INVALID_PAYLOAD": "El cuerpo de la solicitud no cumple con el esquema esperado.",
+  "MISSING_ACCESS_TOKEN": "Falta el token de acceso.",
+  "INVALID_ACCESS_TOKEN": "Token de acceso inválido.",
+  "AUTHENTICATION_REQUIRED": "Autenticación requerida.",
+  "INSUFFICIENT_PERMISSIONS": "Permisos insuficientes para esta operación."
+}

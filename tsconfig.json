@@ -30,20 +30,19 @@
     "isolatedModules": true,
 
     /* Path Aliases */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@db/*": ["src/db/*"],
-      "@auth/*": ["src/auth/*"],
-      "@api/*": ["src/api/*"],
-      "@hal/*": ["src/hal/*"],
-      "@messaging/*": ["src/messaging/*"],
-      "@events/*": ["src/events/*"],
-      "@jobs/*": ["src/jobs/*"],
-      "@clock/*": ["src/clock/*"],
-      "@resilience/*": ["src/resilience/*"],
-      "@shared/*": ["src/shared/*"],
-      "@i18n/*": ["src/i18n/*"]
+      "@/*": ["./src/*"],
+      "@db/*": ["./src/db/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@api/*": ["./src/api/*"],
+      "@hal/*": ["./src/hal/*"],
+      "@messaging/*": ["./src/messaging/*"],
+      "@events/*": ["./src/events/*"],
+      "@jobs/*": ["./src/jobs/*"],
+      "@clock/*": ["./src/clock/*"],
+      "@resilience/*": ["./src/resilience/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@i18n/*": ["./src/i18n/*"]
     },
 
     /* Output */

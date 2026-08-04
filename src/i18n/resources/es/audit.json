@@ -1,0 +1,9 @@
+{
+  "AUDIT_LOGIN_SUCCESS": "Usuario inició sesión exitosamente.",
+  "AUDIT_LOGIN_FAILED": "Intento de inicio de sesión fallido: {{reason}}.",
+  "AUDIT_TOKEN_REFRESHED": "Token de acceso actualizado.",
+  "AUDIT_TOKEN_REUSE_DETECTED": "Reutilización de token de actualización detectada — todas las sesiones revocadas.",
+  "AUDIT_LOGOUT": "Usuario cerró sesión.",
+  "AUDIT_USER_CREATED": "Usuario {{callsign}} creado por {{actor}}.",
+  "AUDIT_PASSWORD_CHANGED": "Contraseña cambiada para el usuario {{callsign}}."
+}

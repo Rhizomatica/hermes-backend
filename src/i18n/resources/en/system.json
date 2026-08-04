@@ -1,0 +1,9 @@
+{
+  "SYSTEM_HEALTH_OK": "All systems operational.",
+  "SYSTEM_HEALTH_DEGRADED": "Some systems are degraded. Check logs for details.",
+  "SYSTEM_CLOCK_UNSYNCED": "System clock is not synchronized. Timestamps may be inaccurate.",
+  "SYSTEM_CLOCK_SYNCED": "System clock has been synchronized.",
+  "SYSTEM_SHUTTING_DOWN": "System is shutting down...",
+  "SYSTEM_REBOOTING": "System is rebooting...",
+  "SYSTEM_RECOVERY_IN_PROGRESS": "System recovery in progress. Some features may be temporarily unavailable."
+}

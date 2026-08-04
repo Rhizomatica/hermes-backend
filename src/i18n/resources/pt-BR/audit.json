@@ -1,0 +1,9 @@
+{
+  "AUDIT_LOGIN_SUCCESS": "Usuário fez login com sucesso.",
+  "AUDIT_LOGIN_FAILED": "Tentativa de login falhou: {{reason}}.",
+  "AUDIT_TOKEN_REFRESHED": "Token de acesso atualizado.",
+  "AUDIT_TOKEN_REUSE_DETECTED": "Reutilização de token de atualização detectada — todas as sessões revogadas.",
+  "AUDIT_LOGOUT": "Usuário fez logout.",
+  "AUDIT_USER_CREATED": "Usuário {{callsign}} criado por {{actor}}.",
+  "AUDIT_PASSWORD_CHANGED": "Senha alterada para o usuário {{callsign}}."
+}

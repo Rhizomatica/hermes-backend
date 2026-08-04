@@ -1,0 +1,16 @@
+{
+  "UNAUTHENTICATED": "Not authenticated. Please provide a valid access token.",
+  "TOKEN_EXPIRED": "The access token has expired. Use the refresh token to obtain a new one.",
+  "FORBIDDEN": "You do not have sufficient permissions for this operation.",
+  "NOT_FOUND": "The requested resource was not found: {{resourceType}}",
+  "CONFLICT": "A resource with the same identifiers already exists.",
+  "RATE_LIMITED": "Too many requests. Please try again in {{retryAfter}} seconds.",
+  "INTERNAL_ERROR": "Internal server error. Contact the administrator if the problem persists.",
+  "CONTENT_TOO_LARGE": "Message content exceeds the {{maxSizeKB}} KB limit.",
+  "PARTICIPANT_LIMIT_EXCEEDED": "The conversation would exceed the maximum of {{maxParticipants}} participants.",
+  "INVALID_PAYLOAD": "The request body does not match the expected schema.",
+  "MISSING_ACCESS_TOKEN": "Missing access token.",
+  "INVALID_ACCESS_TOKEN": "Invalid access token.",
+  "AUTHENTICATION_REQUIRED": "Authentication required.",
+  "INSUFFICIENT_PERMISSIONS": "Insufficient permissions for this operation."
+}
