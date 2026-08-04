@@ -101,7 +101,7 @@ export async function buildApp(deps: AppDependencies): Promise<FastifyInstance> 
   //
   // Note: verifyAccessToken may throw for expired tokens — catch and fall through
   // to Accept-Language. Expired-token locale is still valid for error messages.
-  app.addHook('onRequest', (request: FastifyRequest) => {
+  app.addHook('onRequest', async (request: FastifyRequest) => {
     const acceptLanguage = request.headers['accept-language'];
     const acceptLanguageStr = typeof acceptLanguage === 'string' ? acceptLanguage : undefined;
     request.locale = detectLocale({ acceptLanguageHeader: acceptLanguageStr });
