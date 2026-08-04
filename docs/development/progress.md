@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 1 — Core Infrastructure & Auth |
 | **Branch** | `feat/phase-1-core-infra` |
-| **Last Commit** | `ca2b948` — feat(i18n): add i18n core module with locale detection, translations, and resource files for en/es/pt-BR |
+| **Last Commit** | `025b89c` — fix(i18n): apply review fixes — pt prefix, TranslationKey type safety, D3.12 migration comment |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -49,6 +49,7 @@
 | D1.15 — i18n: resource files `es/` — complete Spanish translation | ✅ | `ca2b948` |
 | D1.16 — i18n: resource files `pt-BR/` — complete Portuguese (Brazil) translation | ✅ | `ca2b948` |
 | D1.17 — i18n: `locale` field in JWT payload + `users.locale` column | ✅ | `ca2b948` |
+| Review fixes — pt prefix collision, TranslationKey union type, D3.12 comment | ✅ | `025b89c` |
 
 ### Phase 2 — Database Layer & Repository Pattern
 
@@ -109,6 +110,7 @@
 ## Notes & Blockers
 
 - D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains), locale detector, `t()` function with interpolation, `sendError()` i18n integration, `i18n:check` script. 96 tests pass (54 existing + 42 new unit tests).
+- Architectural review completed (12 findings, 10 addressed, 2 deferred). P1-P2 fixes applied: pt prefix collision, TranslationKey union type, sendError signature, D3.12 migration comment.
 - Phase 1 is fully complete. All tasks D1.1–D1.17 ✅. Ready for Phase 2.
 - Phase 0.B is complete with all review fixes applied (7 commits on `feat/phase-0b-tooling`).
   - `npm run build` — zero TypeScript errors
@@ -139,6 +141,7 @@
 | 2026-08-03 | Session 5 | D1.11 — auth middleware chain (18 tests) |
 | 2026-08-03 | Session 6 | D1.12 — user endpoints (13 tests) |
 | 2026-08-04 | Session 7 | D1.13–D1.17 — i18n module (18 resource files, 42 tests) |
+| 2026-08-04 | Session 7b | Review fixes — pt prefix, TranslationKey type, D3.12 comment |
 
 ---
 
