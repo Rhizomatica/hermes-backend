@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 3 — HAL & Radio Integration |
 | **Branch** | `feat/phase-3-hal-radio` |
-| **Last Commit** | `TO_BE_COMMITTED` — feat(radio): add radio profiles CRUD endpoints with 24 integration tests (D3.4) |
+| **Last Commit** | `1e3adec` — feat(radio): add radio profiles CRUD endpoints with 24 integration tests (D3.4) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -81,7 +81,7 @@
 | D3.1 — IRadioDriver interface definition | ✅ | `81172d1` |
 | D3.2 — SBitxCLIDriver (exponential backoff, telemetry reconnection) [AUDIT M-8] | ✅ | `cb3ed42` |
 | D3.3 — SimulatedRadioDriver (fake radio for testing) | ✅ | `e767f27` |
-| D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ✅ | `TO_BE_COMMITTED` |
+| D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ✅ | `1e3adec` |
 | D3.5 — `GET /radio/status` — real-time radio snapshot | ⬜ | — |
 | D3.6 — `POST /radio/ptt` — push-to-talk | ⬜ | — |
 | D3.7 — `POST /radio/profiles/:idx/frequency` — set frequency | ⬜ | — |
