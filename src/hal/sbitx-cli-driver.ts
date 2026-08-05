@@ -120,12 +120,13 @@ export class SBitxCLIDriver extends EventEmitter implements IRadioDriver {
   }
 
   /** @inheritdoc */
-  public async disconnect(): Promise<void> {
+  public disconnect(): Promise<void> {
     this.clearReconnectTimer();
     this.stopTelemetryStream();
     this.connected = false;
     this.consecutiveFailures = 0;
     this.emit('disconnected');
+    return Promise.resolve();
   }
 
   /** @inheritdoc */
@@ -263,6 +264,7 @@ export class SBitxCLIDriver extends EventEmitter implements IRadioDriver {
       // Log stderr for diagnostics but do not crash the stream.
       // The CLI may emit warnings on stderr while still producing
       // valid telemetry on stdout.
+      // eslint-disable-next-line no-console
       console.warn(`sBitx CLI stderr: ${chunk.toString()}`);
     });
 

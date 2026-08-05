@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventEmitter } from 'node:events';
+import type { ChildProcess } from 'node:child_process';
 import { SBitxCLIDriver } from '../../../src/hal/sbitx-cli-driver.js';
 import type { TelemetrySnapshot } from '../../../src/hal/driver.js';
 
@@ -13,7 +14,7 @@ vi.mock('node:child_process', () => ({
       Record<string, unknown> | undefined,
       (error: Error | null, stdout: string, stderr: string) => void,
     ]
-  ) => mockExecFile(...args),
+  ): ChildProcess => mockExecFile(...args) as ChildProcess,
 }));
 
 /**
@@ -330,10 +331,10 @@ describe('SBitxCLIDriver', () => {
         current_draw: 2.0,
         ptt_active: false,
       });
-      mockProc.stdout!.emit('data', Buffer.from(line + '\n'));
+      mockProc.stdout.emit('data', Buffer.from(line + '\n'));
 
       expect(telemetrySpy).toHaveBeenCalledOnce();
-      const snapshot = telemetrySpy.mock.calls[0]![0]!;
+      const snapshot = telemetrySpy.mock.calls[0][0];
       expect(snapshot.frequency).toBe(7150);
       expect(snapshot.mode).toBe('LSB');
       expect(snapshot.power).toBe(20);
@@ -366,7 +367,7 @@ describe('SBitxCLIDriver', () => {
       await driver.connect();
 
       // Emit a malformed line followed by a valid one.
-      mockProc.stdout!.emit('data', Buffer.from('NOT VALID JSON\n'));
+      mockProc.stdout.emit('data', Buffer.from('NOT VALID JSON\n'));
       const validLine = JSON.stringify({
         vfo_frequency: 7100,
         mode: 'USB',
@@ -377,7 +378,7 @@ describe('SBitxCLIDriver', () => {
         current_draw: 0.5,
         ptt_active: false,
       });
-      mockProc.stdout!.emit('data', Buffer.from(validLine + '\n'));
+      mockProc.stdout.emit('data', Buffer.from(validLine + '\n'));
 
       // Should only have the valid line.
       expect(telemetrySpy).toHaveBeenCalledOnce();
@@ -400,7 +401,7 @@ describe('SBitxCLIDriver', () => {
 
       await driver.connect();
 
-      mockProc.stderr!.emit('data', Buffer.from('WARNING: low voltage\n'));
+      mockProc.stderr.emit('data', Buffer.from('WARNING: low voltage\n'));
 
       expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('low voltage'));
       warnSpy.mockRestore();
@@ -444,7 +445,7 @@ describe('SBitxCLIDriver', () => {
         current_draw: 18,
         ptt_active: true,
       });
-      mockProc.stdout!.emit('data', Buffer.from(line + '\n'));
+      mockProc.stdout.emit('data', Buffer.from(line + '\n'));
 
       expect(swrProtectionSpy).toHaveBeenCalledWith(4.5);
       // pttOff should have been called.
@@ -488,7 +489,7 @@ describe('SBitxCLIDriver', () => {
         current_draw: 0.5,
         ptt_active: false,
       });
-      mockProc.stdout!.emit('data', Buffer.from(line + '\n'));
+      mockProc.stdout.emit('data', Buffer.from(line + '\n'));
 
       expect(swrProtectionSpy).not.toHaveBeenCalled();
     });
