@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 3 — HAL & Radio Integration |
 | **Branch** | `feat/phase-3-hal-radio` |
-| **Last Commit** | `e5e7c72` — feat(radio): add SimulatedRadioDriver with 1 Hz telemetry + SWR protection (D3.3) |
+| **Last Commit** | `e767f27` — feat(radio): add SimulatedRadioDriver with 1 Hz telemetry + SWR protection (D3.3) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -80,7 +80,7 @@
 |------|:------:|--------|
 | D3.1 — IRadioDriver interface definition | ✅ | `81172d1` |
 | D3.2 — SBitxCLIDriver (exponential backoff, telemetry reconnection) [AUDIT M-8] | ✅ | `cb3ed42` |
-| D3.3 — SimulatedRadioDriver (fake radio for testing) | ✅ | `e5e7c72` |
+| D3.3 — SimulatedRadioDriver (fake radio for testing) | ✅ | `e767f27` |
 | D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ⬜ | — |
 | D3.5 — `GET /radio/status` — real-time radio snapshot | ⬜ | — |
 | D3.6 — `POST /radio/ptt` — push-to-talk | ⬜ | — |
