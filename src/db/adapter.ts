@@ -21,9 +21,36 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
  * All repository classes depend on this interface via constructor injection.
  * No direct Drizzle queries in controllers or services — data access goes through
  * repositories implementing this adapter.
+ *
+ * ## Database Client Type
+ *
+ * `DatabaseClient` is currently aliased to `BetterSQLite3Database`. When
+ * PostgreSQL support is added (Phase 10+), this alias will change to a union
+ * or generic type. Repositories that need a specific backend can parameterize
+ * `DatabaseAdapter<T>`; repositories that are backend-agnostic can use
+ * the default parameter. See ADR-001 for the SQLite-first rationale.
  */
-export interface DatabaseAdapter {
-  readonly db: BetterSQLite3Database;
+export type DatabaseClient = BetterSQLite3Database;
+
+export interface DatabaseAdapter<TDb = DatabaseClient> {
+  readonly db: TDb;
+
+  /**
+   * Execute work within a database transaction. If the callback resolves, the
+   * transaction is committed. If it throws, the transaction is rolled back.
+   *
+   * In SQLite, transaction() uses `db.transaction()` which handles BEGIN/COMMIT/ROLLBACK.
+   * In PostgreSQL (Phase 10+), this will map to `client.query('BEGIN')` / `COMMIT` / `ROLLBACK`.
+   *
+   * @example
+   *   await adapter.transaction(async (tx) => {
+   *     const messages = new MessagesRepository({ db: tx });
+   *     const deliveries = new MessageDeliveriesRepository({ db: tx });
+   *     const msg = await messages.create(...);
+   *     await deliveries.create(...);
+   *   });
+   */
+  transaction<T>(work: (txDb: TDb) => Promise<T>): Promise<T>;
 
   /** Check database connectivity and integrity (PRAGMA integrity_check) */
   healthCheck(): Promise<{ ok: boolean; details?: string }>;

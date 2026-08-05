@@ -41,7 +41,7 @@ describe('User Endpoints', () => {
   async function createTestUser(
     callsign?: string,
     role: 'admin' | 'operator' | 'user' | 'readonly' = 'user',
-  ) {
+  ): Promise<{ id: string; callsign: string; accessToken: string; role: string }> {
     const passwordHash = await hashPassword('testpass123');
     const userCallsign = callsign ?? `XA1${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
     const user = await app.services.users.create({
@@ -194,7 +194,7 @@ describe('User Endpoints', () => {
 
     it('should return 409 when callsign already exists', async () => {
       const admin = await createTestUser(undefined, 'admin');
-      const existing = await createTestUser('XA9DUP', 'user');
+      await createTestUser('XA9DUP', 'user');
 
       const response = await app.inject({
         method: 'POST',
