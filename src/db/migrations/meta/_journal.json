@@ -8,6 +8,27 @@
       "when": 1785416632315,
       "tag": "0000_handy_salo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1785500000000,
+      "tag": "0001_add_refresh_replaced_by",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785600000000,
+      "tag": "0002_add_phase2_tables",
+      "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1785950000000,
+      "tag": "0003_seed_admin_user",
+      "breakpoints": false
     }
   ]
 }

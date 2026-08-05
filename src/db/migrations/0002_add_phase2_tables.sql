@@ -14,10 +14,13 @@ CREATE TABLE conversations (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_conversations_type ON conversations (type);
+--> statement-breakpoint
 CREATE INDEX idx_conversations_last_activity ON conversations (last_activity_at);
+--> statement-breakpoint
 CREATE INDEX idx_conversations_created_by ON conversations (created_by);
-
+--> statement-breakpoint
 CREATE TABLE conversation_participants (
   id TEXT PRIMARY KEY NOT NULL,
   conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
@@ -30,9 +33,11 @@ CREATE TABLE conversation_participants (
   left_at TEXT,
   UNIQUE (conversation_id, user_id)
 );
+--> statement-breakpoint
 CREATE INDEX idx_conv_participants_conversation ON conversation_participants (conversation_id);
+--> statement-breakpoint
 CREATE INDEX idx_conv_participants_user ON conversation_participants (user_id);
-
+--> statement-breakpoint
 CREATE TABLE messages (
   id TEXT PRIMARY KEY NOT NULL,
   conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
@@ -51,11 +56,15 @@ CREATE TABLE messages (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_messages_conversation_created ON messages (conversation_id, created_at);
+--> statement-breakpoint
 CREATE INDEX idx_messages_sender ON messages (sender_id);
+--> statement-breakpoint
 CREATE INDEX idx_messages_client_id ON messages (client_message_id);
+--> statement-breakpoint
 CREATE INDEX idx_messages_reply_to ON messages (reply_to_message_id);
-
+--> statement-breakpoint
 CREATE TABLE message_deliveries (
   id TEXT PRIMARY KEY NOT NULL,
   message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
@@ -71,10 +80,13 @@ CREATE TABLE message_deliveries (
   next_retry_at TEXT,
   UNIQUE (message_id, recipient_id, channel)
 );
+--> statement-breakpoint
 CREATE INDEX idx_deliveries_message ON message_deliveries (message_id);
+--> statement-breakpoint
 CREATE INDEX idx_deliveries_recipient_status ON message_deliveries (recipient_id, status);
+--> statement-breakpoint
 CREATE INDEX idx_deliveries_next_retry ON message_deliveries (next_retry_at);
-
+--> statement-breakpoint
 CREATE TABLE message_reactions (
   id TEXT PRIMARY KEY NOT NULL,
   message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
@@ -83,8 +95,9 @@ CREATE TABLE message_reactions (
   created_at TEXT NOT NULL,
   UNIQUE (message_id, user_id, emoji)
 );
+--> statement-breakpoint
 CREATE INDEX idx_reactions_message ON message_reactions (message_id);
-
+--> statement-breakpoint
 CREATE TABLE attachments (
   id TEXT PRIMARY KEY NOT NULL,
   message_id TEXT REFERENCES messages(id) ON DELETE SET NULL,
@@ -104,11 +117,15 @@ CREATE TABLE attachments (
   expires_at TEXT,
   deleted_at TEXT
 );
+--> statement-breakpoint
 CREATE INDEX idx_attachments_message ON attachments (message_id);
+--> statement-breakpoint
 CREATE INDEX idx_attachments_checksum ON attachments (checksum);
+--> statement-breakpoint
 CREATE INDEX idx_attachments_uploader ON attachments (uploader_id);
+--> statement-breakpoint
 CREATE INDEX idx_attachments_status ON attachments (status);
-
+--> statement-breakpoint
 CREATE TABLE message_envelopes (
   id TEXT PRIMARY KEY NOT NULL,
   message_id TEXT NOT NULL UNIQUE REFERENCES messages(id) ON DELETE CASCADE,
@@ -127,10 +144,13 @@ CREATE TABLE message_envelopes (
   created_at TEXT NOT NULL,
   processed_at TEXT
 );
+--> statement-breakpoint
 CREATE INDEX idx_envelopes_message ON message_envelopes (message_id);
+--> statement-breakpoint
 CREATE INDEX idx_envelopes_status ON message_envelopes (status, transport);
+--> statement-breakpoint
 CREATE INDEX idx_envelopes_external_id ON message_envelopes (external_message_id);
-
+--> statement-breakpoint
 CREATE TABLE radio_profiles (
   id TEXT PRIMARY KEY NOT NULL,
   station_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -147,7 +167,7 @@ CREATE TABLE radio_profiles (
   updated_at TEXT NOT NULL,
   UNIQUE (station_id, profile_index)
 );
-
+--> statement-breakpoint
 CREATE TABLE radio_sessions (
   id TEXT PRIMARY KEY NOT NULL,
   station_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -158,8 +178,9 @@ CREATE TABLE radio_sessions (
   bytes_rx INTEGER DEFAULT 0 NOT NULL,
   metadata TEXT DEFAULT '{}' NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_radio_sessions_station ON radio_sessions (station_id, started_at);
-
+--> statement-breakpoint
 CREATE TABLE frequencies (
   id TEXT PRIMARY KEY NOT NULL,
   alias TEXT NOT NULL UNIQUE,
@@ -171,8 +192,9 @@ CREATE TABLE frequencies (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_frequencies_alias ON frequencies (alias);
-
+--> statement-breakpoint
 CREATE TABLE connection_schedules (
   id TEXT PRIMARY KEY NOT NULL,
   target_callsign TEXT NOT NULL,
@@ -186,8 +208,9 @@ CREATE TABLE connection_schedules (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_schedules_next_run ON connection_schedules (next_run_at);
-
+--> statement-breakpoint
 CREATE TABLE audit_logs (
   id TEXT PRIMARY KEY NOT NULL,
   actor_id TEXT REFERENCES users(id) ON DELETE SET NULL,
@@ -202,10 +225,13 @@ CREATE TABLE audit_logs (
   locale TEXT DEFAULT 'en' NOT NULL CHECK(locale IN ('en', 'es', 'pt-BR')),
   created_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_audit_actor ON audit_logs (actor_id, created_at);
+--> statement-breakpoint
 CREATE INDEX idx_audit_entity ON audit_logs (entity_type, entity_id, created_at);
+--> statement-breakpoint
 CREATE INDEX idx_audit_action ON audit_logs (action, created_at);
-
+--> statement-breakpoint
 CREATE TABLE jobs (
   id TEXT PRIMARY KEY NOT NULL,
   type TEXT NOT NULL,
@@ -221,9 +247,11 @@ CREATE TABLE jobs (
   error TEXT,
   created_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_jobs_status_priority ON jobs (status, priority, created_at);
+--> statement-breakpoint
 CREATE INDEX idx_jobs_scheduled ON jobs (scheduled_at);
-
+--> statement-breakpoint
 CREATE TABLE user_devices (
   id TEXT PRIMARY KEY NOT NULL,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -235,4 +263,5 @@ CREATE TABLE user_devices (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+--> statement-breakpoint
 CREATE INDEX idx_user_devices_user_id ON user_devices (user_id);

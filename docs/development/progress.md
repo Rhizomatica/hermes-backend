@@ -146,7 +146,10 @@
 - 340 total tests pass (124 unit + 120 integration + 96 other).
 - D3.2 complete: SBitxCLIDriver with exponential backoff (1s→2s→4s→...→60s cap), SWR protection (>3.0 cuts TX), 10 consecutive failure permanent disconnect, 20 unit tests.
 - `npm run build` — zero TypeScript errors.
-- `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
+- Database setup uses `drizzle-kit migrate` exclusively. No custom migration or seed scripts — schema declared in `src/db/schema/*.ts`, migrations (schema + seed) in `src/db/migrations/*.sql`. `scripts/migrate.ts` and `scripts/seed-test-user.ts` removed.
+- Migration files: 0000 (users), 0001 (user_sessions + refresh_replaced_by), 0002 (phase 2 tables + statement-breakpoint), 0003 (seed admin user root/amazonia).
+- `npm run db:migrate` applies all 4 migrations successfully (4 fresh DB cycles verified). `npm run db:generate` still fails on ESM/CJS resolution for schema files.
+- Seed user migrated from custom script to `0003_seed_admin_user.sql` migration file with precomputed bcrypt hash.
 - GitHub push failed (no credentials). PR must be created manually.
 - D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains).
 - Architectural review completed (12 findings, 10 addressed, 2 deferred).
