@@ -19,6 +19,20 @@ export class SQLiteAdapter implements DatabaseAdapter {
     this.db = drizzle(this.sqlite);
   }
 
+  /**
+   * Execute work within a transaction. Uses Drizzle's `db.transaction()` which
+   * maps to better-sqlite3's native transaction support.
+   *
+   * The callback receives the same `db` instance wrapped in a transactional scope.
+   * If the callback resolves, the transaction commits. If it throws, the transaction
+   * rolls back automatically.
+   */
+  async transaction<T>(work: (txDb: BetterSQLite3Database) => Promise<T>): Promise<T> {
+    return this.db.transaction(async (tx) => {
+      return work(tx);
+    });
+  }
+
   async healthCheck(): Promise<{ ok: boolean; details?: string }> {
     try {
       const result = this.sqlite.pragma('integrity_check', { simple: true }) as string;
