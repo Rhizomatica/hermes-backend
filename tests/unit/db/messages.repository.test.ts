@@ -2,13 +2,12 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createHash } from 'node:crypto';
 import { SQLiteAdapter } from '../../../src/db/sqlite.adapter.js';
 import { MessagesRepository } from '../../../src/db/repositories/messages.repository.js';
-import type { MessageRow } from '../../../src/db/repositories/messages.repository.js';
+import type { MessageRow, CreateMessageInput } from '../../../src/db/repositories/messages.repository.js';
 
 let adapter: SQLiteAdapter;
 let repo: MessagesRepository;
 
-function createTestMessage(overrides?: Partial<Omit<MessageRow, 'id' | 'contentChecksum'>>): Omit<MessageRow, 'id' | 'contentChecksum'> {
-  const now = new Date().toISOString();
+function createTestMessage(overrides?: Partial<CreateMessageInput>): CreateMessageInput {
   return {
     conversationId: 'conv-id-1',
     senderId: 'user-id-1',
@@ -22,8 +21,6 @@ function createTestMessage(overrides?: Partial<Omit<MessageRow, 'id' | 'contentC
     editedAt: null,
     deletedAt: null,
     metadata: '{}',
-    createdAt: now,
-    updatedAt: now,
     ...overrides,
   };
 }
@@ -73,7 +70,7 @@ afterAll(async () => {
 
 describe('MessagesRepository', () => {
   describe('create', () => {
-    it('should create a message with an id and SHA-256 content checksum', async () => {
+    it('should create a message with auto-generated timestamps when not provided', async () => {
       const input = createTestMessage({ content: 'Test content' });
       const result = await repo.create(input);
 
@@ -83,6 +80,21 @@ describe('MessagesRepository', () => {
       expect(result.contentChecksum).toBe(expectedChecksum('Test content'));
       expect(result.contentType).toBe('text');
       expect(result.status).toBe('sent');
+      expect(result.createdAt).toBeDefined();
+      expect(result.updatedAt).toBeDefined();
+    });
+
+    it('should respect explicit timestamps when provided', async () => {
+      const explicitTime = new Date('2025-01-15T12:00:00Z').toISOString();
+      const input = createTestMessage({
+        content: 'Explicit time',
+        createdAt: explicitTime,
+        updatedAt: explicitTime,
+      });
+      const result = await repo.create(input);
+
+      expect(result.createdAt).toBe(explicitTime);
+      expect(result.updatedAt).toBe(explicitTime);
     });
 
     it('should store null checksum for null content', async () => {
@@ -91,6 +103,11 @@ describe('MessagesRepository', () => {
 
       expect(result.content).toBeNull();
       expect(result.contentChecksum).toBeNull();
+    });
+
+    it('should reject invalid JSON metadata', async () => {
+      const input = createTestMessage({ metadata: 'not-valid-json' });
+      await expect(repo.create(input)).rejects.toThrow('Invalid JSON in messages.metadata');
     });
 
     it('should create a message with a clientMessageId for idempotency', async () => {
@@ -159,19 +176,18 @@ describe('MessagesRepository', () => {
 
   describe('listByConversationId', () => {
     it('should list messages in a conversation ordered by newest first', async () => {
-      const now = new Date();
-      const earlier = new Date(now.getTime() - 3600000).toISOString();
-      const later = now.toISOString();
+      const earlier = new Date('2025-01-01T00:00:00Z').toISOString();
+      const later = new Date('2025-01-02T00:00:00Z').toISOString();
 
       await repo.create(createTestMessage({ conversationId: 'conv-list', content: 'Older', createdAt: earlier }));
       await repo.create(createTestMessage({ conversationId: 'conv-list', content: 'Newer', createdAt: later }));
 
-      const results = await repo.listByConversationId('conv-list');
-      expect(results.length).toBeGreaterThanOrEqual(2);
+      const { items } = await repo.listByConversationId('conv-list');
+      expect(items.length).toBeGreaterThanOrEqual(2);
 
       // Newest first
-      const newerIdx = results.findIndex((m) => m.content === 'Newer');
-      const olderIdx = results.findIndex((m) => m.content === 'Older');
+      const newerIdx = items.findIndex((m) => m.content === 'Newer');
+      const olderIdx = items.findIndex((m) => m.content === 'Older');
       expect(newerIdx).toBeLessThan(olderIdx);
     });
 
@@ -179,8 +195,8 @@ describe('MessagesRepository', () => {
       const msg = await repo.create(createTestMessage({ conversationId: 'conv-del' }));
       await repo.softDelete(msg.id);
 
-      const results = await repo.listByConversationId('conv-del');
-      expect(results.find((m) => m.id === msg.id)).toBeUndefined();
+      const { items } = await repo.listByConversationId('conv-del');
+      expect(items.find((m) => m.id === msg.id)).toBeUndefined();
     });
 
     it('should respect limit', async () => {
@@ -188,34 +204,51 @@ describe('MessagesRepository', () => {
       await repo.create(createTestMessage({ conversationId: 'conv-limit', content: 'M2' }));
       await repo.create(createTestMessage({ conversationId: 'conv-limit', content: 'M3' }));
 
-      const results = await repo.listByConversationId('conv-limit', { limit: 2 });
-      expect(results.length).toBe(2);
+      const { items } = await repo.listByConversationId('conv-limit', { limit: 2 });
+      expect(items.length).toBe(2);
     });
 
-    it('should support cursor-based pagination', async () => {
-      const now = new Date();
-      const t1 = new Date(now.getTime() - 10000).toISOString();
-      const t2 = new Date(now.getTime() - 20000).toISOString();
-      const t3 = new Date(now.getTime() - 30000).toISOString();
+    it('should support cursor-based pagination with nextCursor', async () => {
+      const t1 = new Date('2025-01-03T00:00:00Z').toISOString();
+      const t2 = new Date('2025-01-02T00:00:00Z').toISOString();
+      const t3 = new Date('2025-01-01T00:00:00Z').toISOString();
 
       await repo.create(createTestMessage({ conversationId: 'conv-cursor', content: 'M1', createdAt: t1 }));
       await repo.create(createTestMessage({ conversationId: 'conv-cursor', content: 'M2', createdAt: t2 }));
       await repo.create(createTestMessage({ conversationId: 'conv-cursor', content: 'M3', createdAt: t3 }));
 
       // Using cursor = t2, should only get messages created before t2 (i.e., M3)
-      const results = await repo.listByConversationId('conv-cursor', {
+      const { items, nextCursor } = await repo.listByConversationId('conv-cursor', {
         limit: 10,
         cursor: t2,
       });
-      const contents = results.map((m) => m.content);
+      const contents = items.map((m) => m.content);
       expect(contents).toContain('M3');
       expect(contents).not.toContain('M1');
       expect(contents).not.toContain('M2');
+      // Only one item, so nextCursor should be null
+      expect(nextCursor).toBeNull();
+    });
+
+    it('should return nextCursor when there are more items', async () => {
+      const t1 = new Date('2025-01-03T00:00:00Z').toISOString();
+      const t2 = new Date('2025-01-02T00:00:00Z').toISOString();
+      const t3 = new Date('2025-01-01T00:00:00Z').toISOString();
+
+      await repo.create(createTestMessage({ conversationId: 'conv-next', content: 'M1', createdAt: t1 }));
+      await repo.create(createTestMessage({ conversationId: 'conv-next', content: 'M2', createdAt: t2 }));
+      await repo.create(createTestMessage({ conversationId: 'conv-next', content: 'M3', createdAt: t3 }));
+
+      const { items, nextCursor } = await repo.listByConversationId('conv-next', { limit: 2 });
+
+      expect(items.length).toBe(2);
+      // There should be a next cursor since we have 3 items with limit 2
+      expect(nextCursor).not.toBeNull();
     });
 
     it('should return empty array for conversation with no messages', async () => {
-      const results = await repo.listByConversationId('empty-conv');
-      expect(results).toEqual([]);
+      const { items } = await repo.listByConversationId('empty-conv');
+      expect(items).toEqual([]);
     });
   });
 
@@ -230,12 +263,34 @@ describe('MessagesRepository', () => {
       expect(updated!.contentChecksum).not.toBe(created.contentChecksum);
     });
 
+    it('should auto-update updatedAt on modification', async () => {
+      const created = await repo.create(createTestMessage({ content: 'Original' }));
+      // Small delay to ensure timestamp difference
+      await new Promise((r) => setTimeout(r, 10));
+      const updated = await repo.update(created.id, { content: 'Updated content' });
+
+      expect(updated).not.toBeNull();
+      expect(new Date(updated!.updatedAt).getTime()).toBeGreaterThan(new Date(created.updatedAt).getTime());
+    });
+
     it('should update message status', async () => {
       const created = await repo.create(createTestMessage({ status: 'draft' }));
       const updated = await repo.update(created.id, { status: 'sent' });
 
       expect(updated).not.toBeNull();
       expect(updated!.status).toBe('sent');
+    });
+
+    it('should reject invalid JSON metadata on update', async () => {
+      const created = await repo.create(createTestMessage());
+      await expect(repo.update(created.id, { metadata: 'bad-json' })).rejects.toThrow('Invalid JSON in messages.metadata');
+    });
+
+    it('should accept valid JSON metadata on update', async () => {
+      const created = await repo.create(createTestMessage());
+      const updated = await repo.update(created.id, { metadata: '{"key":"value"}' });
+      expect(updated).not.toBeNull();
+      expect(updated!.metadata).toBe('{"key":"value"}');
     });
 
     it('should return null when updating non-existent message', async () => {
@@ -245,7 +300,7 @@ describe('MessagesRepository', () => {
   });
 
   describe('softDelete', () => {
-    it('should set deletedAt and nullify content', async () => {
+    it('should set deletedAt but preserve content', async () => {
       const created = await repo.create(createTestMessage({ content: 'To delete' }));
       const result = await repo.softDelete(created.id);
 
@@ -254,7 +309,8 @@ describe('MessagesRepository', () => {
       const updated = await repo.findById(created.id);
       expect(updated).not.toBeNull();
       expect(updated!.deletedAt).not.toBeNull();
-      expect(updated!.content).toBeNull();
+      // Content is PRESERVED (not nullified) for compliance
+      expect(updated!.content).toBe('To delete');
     });
 
     it('should return false when message is already deleted', async () => {
@@ -267,6 +323,54 @@ describe('MessagesRepository', () => {
     it('should return false for non-existent message', async () => {
       const result = await repo.softDelete('non-existent');
       expect(result).toBe(false);
+    });
+  });
+
+  describe('purgeExpiredContent', () => {
+    it('should nullify content for messages deleted before the cut-off date', async () => {
+      const msg1 = await repo.create(createTestMessage({ content: 'Purge me 1' }));
+      const msg2 = await repo.create(createTestMessage({ content: 'Purge me 2' }));
+
+      // Soft-delete both
+      await repo.softDelete(msg1.id);
+      await repo.softDelete(msg2.id);
+
+      // Purge content deleted before a future timestamp (covers both)
+      const futureDate = new Date(Date.now() + 86400000).toISOString();
+      const purged = await repo.purgeExpiredContent(futureDate);
+      expect(purged).toBeGreaterThanOrEqual(2);
+
+      const updated1 = await repo.findById(msg1.id);
+      const updated2 = await repo.findById(msg2.id);
+      expect(updated1!.content).toBeNull();
+      expect(updated1!.contentChecksum).toBeNull();
+      expect(updated2!.content).toBeNull();
+      expect(updated2!.contentChecksum).toBeNull();
+    });
+
+    it('should not purge content from non-deleted messages', async () => {
+      const msg = await repo.create(createTestMessage({ content: 'Keep me' }));
+
+      const futureDate = new Date(Date.now() + 86400000).toISOString();
+      const purged = await repo.purgeExpiredContent(futureDate);
+      expect(purged).toBe(0); // no soft-deleted messages
+
+      const found = await repo.findById(msg.id);
+      expect(found!.content).toBe('Keep me');
+    });
+
+    it('should not re-purge already purged content', async () => {
+      const msg = await repo.create(createTestMessage({ content: 'Purge once' }));
+      await repo.softDelete(msg.id);
+
+      // First purge
+      const futureDate = new Date(Date.now() + 86400000).toISOString();
+      const purged1 = await repo.purgeExpiredContent(futureDate);
+      expect(purged1).toBe(1);
+
+      // Second purge should not count the same message (content is already null)
+      const purged2 = await repo.purgeExpiredContent(futureDate);
+      expect(purged2).toBe(0);
     });
   });
 
