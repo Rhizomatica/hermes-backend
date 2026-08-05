@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 3 — HAL & Radio Integration |
 | **Branch** | `feat/phase-3-hal-radio` |
-| **Last Commit** | `81172d1` — feat(radio): add IRadioDriver interface with typed events and status types (D3.1) |
+| **Last Commit** | `cb3ed42` — feat(radio): add SBitxCLIDriver with exponential backoff + SWR protection (D3.2) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -73,31 +73,13 @@
 | D2.14 — locale column on users (already exists from Phase 1) | ✅ | N/A (Phase 1) |
 | D2.15 — locale column on audit_logs | ✅ | `aa6b9f6` |
 | D2.16 — locale column on message_envelopes | ✅ | `aa6b9f6` |
-| D2.1 — conversations table + repository | ✅ | `7b59eea` |
-| D2.2 — conversation_participants table + repository | ✅ | `e2e5c3a` |
-| D2.3 — messages table + repository (idempotency) | ✅ | `f581104` |
-| D2.3a — content_checksum column (AUDIT H-1) | ✅ | `f581104` |
-| D2.4 — message_deliveries table + repository | ✅ | `1a4f373` |
-| D2.5 — message_reactions table + repository | ✅ | `1a4f373` |
-| D2.6 — attachments table + repository | ✅ | `1a4f373` |
-| D2.7 — message_envelopes table + repository | ✅ | `1a4f373` |
-| D2.8 — radio_profiles + radio_sessions tables + repos | ✅ | `aa6b9f6` |
-| D2.9 — frequencies + connection_schedules tables + repos | ✅ | `aa6b9f6` |
-| D2.10 — audit_logs table + repository (immutable, append-only) | ✅ | `aa6b9f6` |
-| D2.11 — jobs table + repository (SQLite-backed queue) | ✅ | `aa6b9f6` |
-| user_devices table + repository | ✅ | `aa6b9f6` |
-| D2.12 — DatabaseAdapter interface for all repositories | ✅ | (inherent — all repos inject adapter) |
-| D2.13 — Migration pipeline (0002_add_phase2_tables.sql) | ✅ | `e3f0ed8` |
-| D2.14 — locale column on users (already exists from Phase 1) | ✅ | N/A (Phase 1) |
-| D2.15 — locale column on audit_logs | ✅ | `aa6b9f6` |
-| D2.16 — locale column on message_envelopes | ✅ | `aa6b9f6` |
 
 ### Phase 3 — HAL & Radio Integration
 
 | Task | Status | Commit |
 |------|:------:|--------|
 | D3.1 — IRadioDriver interface definition | ✅ | `81172d1` |
-| D3.2 — SBitxCLIDriver (exponential backoff, telemetry reconnection) [AUDIT M-8] | ⬜ | — |
+| D3.2 — SBitxCLIDriver (exponential backoff, telemetry reconnection) [AUDIT M-8] | ✅ | `cb3ed42` |
 | D3.3 — SimulatedRadioDriver (fake radio for testing) | ⬜ | — |
 | D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ⬜ | — |
 | D3.5 — `GET /radio/status` — real-time radio snapshot | ⬜ | — |
@@ -117,7 +99,6 @@
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D4.0–D4.16) | ⬜ BLOCKED (Phase 3 not complete) | — |
 | All tasks (D4.0–D4.16) | ⬜ BLOCKED (Phase 3 not complete) | — |
 
 ### Phase 5 — WebSocket Gateway
@@ -154,7 +135,7 @@
 
 ## Next Task
 
-> **D3.2** — `SBitxCLIDriver` implementation (wraps `execFile` calls to sBitx CLI, exponential backoff for telemetry reconnection, permanent disconnect after 10 consecutive failures). See `docs/architecture/hardware-integration.md` for full spec. File: `src/hal/sbitx-cli-driver.ts`.
+> **D3.3** — `SimulatedRadioDriver` (fake radio for testing/development). Implements `IRadioDriver` with plausible synthetic data — no hardware required. Frequencies, SWR, temperature, voltage all simulated. 1 Hz telemetry via `setInterval`. File: `src/hal/simulated-driver.ts`. See `docs/architecture/hardware-integration.md` lines 244–306 for spec.
 
 ---
 
@@ -162,12 +143,8 @@
 
 - Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
 - 80 unit tests across 7 repository test files (all pass).
-- 176 total tests pass (80 unit + 96 integration).
-- `npm run build` — zero TypeScript errors.
-- `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
-- Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
-- 80 unit tests across 7 repository test files (all pass).
-- 176 total tests pass (80 unit + 96 integration).
+- 292 total tests pass (100 unit + 96 integration + 20 hal).
+- D3.2 complete: SBitxCLIDriver with exponential backoff (1s→2s→4s→...→60s cap), SWR protection (>3.0 cuts TX), 10 consecutive failure permanent disconnect, 20 unit tests.
 - `npm run build` — zero TypeScript errors.
 - `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
 - GitHub push failed (no credentials). PR must be created manually.
@@ -194,6 +171,7 @@
 | 2026-08-04 | Session 7b | Review fixes — pt prefix, TranslationKey type, D3.12 comment |
 | 2026-08-04 | Session 8 | Phase 2: D2.1–D2.16 — all 14 tables, 14 repositories, migration, 80 unit tests |
 | 2026-08-05 | Session 9 | D3.1 — IRadioDriver interface with typed events and status types |
+| 2026-08-05 | Session 10 | D3.2 — SBitxCLIDriver with exponential backoff, SWR protection, 20 unit tests |
 
 ---
 
