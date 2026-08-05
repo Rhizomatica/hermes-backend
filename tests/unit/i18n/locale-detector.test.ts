@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { detectLocale, parseAcceptLanguage } from '../../../src/i18n/locale-detector.js';
-import type { Locale } from '../../../src/i18n/types.js';
+
 
 describe('Locale Detector', () => {
   describe('detectLocale', () => {

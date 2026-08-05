@@ -73,6 +73,24 @@
 | D2.14 — locale column on users (already exists from Phase 1) | ✅ | N/A (Phase 1) |
 | D2.15 — locale column on audit_logs | ✅ | `aa6b9f6` |
 | D2.16 — locale column on message_envelopes | ✅ | `aa6b9f6` |
+| D2.1 — conversations table + repository | ✅ | `7b59eea` |
+| D2.2 — conversation_participants table + repository | ✅ | `e2e5c3a` |
+| D2.3 — messages table + repository (idempotency) | ✅ | `f581104` |
+| D2.3a — content_checksum column (AUDIT H-1) | ✅ | `f581104` |
+| D2.4 — message_deliveries table + repository | ✅ | `1a4f373` |
+| D2.5 — message_reactions table + repository | ✅ | `1a4f373` |
+| D2.6 — attachments table + repository | ✅ | `1a4f373` |
+| D2.7 — message_envelopes table + repository | ✅ | `1a4f373` |
+| D2.8 — radio_profiles + radio_sessions tables + repos | ✅ | `aa6b9f6` |
+| D2.9 — frequencies + connection_schedules tables + repos | ✅ | `aa6b9f6` |
+| D2.10 — audit_logs table + repository (immutable, append-only) | ✅ | `aa6b9f6` |
+| D2.11 — jobs table + repository (SQLite-backed queue) | ✅ | `aa6b9f6` |
+| user_devices table + repository | ✅ | `aa6b9f6` |
+| D2.12 — DatabaseAdapter interface for all repositories | ✅ | (inherent — all repos inject adapter) |
+| D2.13 — Migration pipeline (0002_add_phase2_tables.sql) | ✅ | `e3f0ed8` |
+| D2.14 — locale column on users (already exists from Phase 1) | ✅ | N/A (Phase 1) |
+| D2.15 — locale column on audit_logs | ✅ | `aa6b9f6` |
+| D2.16 — locale column on message_envelopes | ✅ | `aa6b9f6` |
 
 ### Phase 3 — HAL & Radio Integration
 
@@ -99,6 +117,7 @@
 
 | Task | Status | Commit |
 |------|:------:|--------|
+| All tasks (D4.0–D4.16) | ⬜ BLOCKED (Phase 3 not complete) | — |
 | All tasks (D4.0–D4.16) | ⬜ BLOCKED (Phase 3 not complete) | — |
 
 ### Phase 5 — WebSocket Gateway
@@ -141,6 +160,11 @@
 
 ## Notes & Blockers
 
+- Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
+- 80 unit tests across 7 repository test files (all pass).
+- 176 total tests pass (80 unit + 96 integration).
+- `npm run build` — zero TypeScript errors.
+- `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
 - Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
 - 80 unit tests across 7 repository test files (all pass).
 - 176 total tests pass (80 unit + 96 integration).

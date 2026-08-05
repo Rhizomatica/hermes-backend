@@ -23,7 +23,7 @@ export function logoutRoutes(app: FastifyInstance): void {
     // Verify the refresh token is a well-formed JWT
     let refreshPayload: { sub: string };
     try {
-      refreshPayload = token.verifyRefreshToken(refreshToken) as unknown as { sub: string };
+      refreshPayload = token.verifyRefreshToken(refreshToken);
     } catch {
       return reply.code(401).send({ error: 'auth.invalid_refresh_token' });
     }
