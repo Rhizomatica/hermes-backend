@@ -111,7 +111,7 @@ describe('Translations', () => {
     });
 
     it('should preserve unmatched template variables', () => {
-      const result = t('en', 'NOT_FOUND', {} as Record<string, string | number>);
+      const result = t('en', 'NOT_FOUND', {});
       expect(result).toBe(
         'The requested resource was not found: {{resourceType}}',
       );

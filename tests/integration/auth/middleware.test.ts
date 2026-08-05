@@ -66,7 +66,7 @@ describe('Auth Middleware Chain', () => {
   async function createTestUser(
     callsign?: string,
     role: 'admin' | 'operator' | 'user' | 'readonly' = 'user',
-  ) {
+  ): Promise<{ id: string; callsign: string; accessToken: string; role: string }> {
     const passwordHash = await hashPassword('testpass123');
     const userCallsign = callsign ?? `XA1${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
     const user = await app.services.users.create({

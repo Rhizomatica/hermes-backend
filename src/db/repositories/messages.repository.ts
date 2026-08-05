@@ -142,7 +142,7 @@ export class MessagesRepository {
 
     await this.adapter.db
       .update(messages)
-      .set(values as typeof messages.$inferInsert)
+      .set(values)
       .where(eq(messages.id, id));
     return this.findById(id);
   }
