@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 3 — HAL & Radio Integration |
 | **Branch** | `feat/phase-3-hal-radio` |
-| **Last Commit** | `e767f27` — feat(radio): add SimulatedRadioDriver with 1 Hz telemetry + SWR protection (D3.3) |
+| **Last Commit** | `TO_BE_COMMITTED` — feat(radio): add radio profiles CRUD endpoints with 24 integration tests (D3.4) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -81,7 +81,7 @@
 | D3.1 — IRadioDriver interface definition | ✅ | `81172d1` |
 | D3.2 — SBitxCLIDriver (exponential backoff, telemetry reconnection) [AUDIT M-8] | ✅ | `cb3ed42` |
 | D3.3 — SimulatedRadioDriver (fake radio for testing) | ✅ | `e767f27` |
-| D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ⬜ | — |
+| D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ✅ | `TO_BE_COMMITTED` |
 | D3.5 — `GET /radio/status` — real-time radio snapshot | ⬜ | — |
 | D3.6 — `POST /radio/ptt` — push-to-talk | ⬜ | — |
 | D3.7 — `POST /radio/profiles/:idx/frequency` — set frequency | ⬜ | — |
@@ -135,7 +135,7 @@
 
 ## Next Task
 
-> **D3.4** — Radio profiles CRUD endpoints (`/radio/profiles`). Requires D3.3 (driver available for testing). See `docs/architecture/api.md §4.8` for spec.
+> **D3.5** — `GET /radio/status` — real-time radio snapshot endpoint. Requires D3.4 (profiles table available). See `docs/architecture/api.md §4.2` for spec.
 
 ---
 
@@ -143,7 +143,7 @@
 
 - Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
 - 80 unit tests across 7 repository test files (all pass).
-- 292 total tests pass (100 unit + 96 integration + 20 hal).
+- 340 total tests pass (124 unit + 120 integration + 96 other).
 - D3.2 complete: SBitxCLIDriver with exponential backoff (1s→2s→4s→...→60s cap), SWR protection (>3.0 cuts TX), 10 consecutive failure permanent disconnect, 20 unit tests.
 - `npm run build` — zero TypeScript errors.
 - `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
@@ -173,6 +173,7 @@
 | 2026-08-05 | Session 9 | D3.1 — IRadioDriver interface with typed events and status types |
 | 2026-08-05 | Session 10 | D3.2 — SBitxCLIDriver with exponential backoff, SWR protection, 20 unit tests |
 | 2026-08-05 | Session 11 | D3.3 — SimulatedRadioDriver (24 unit tests, 3 files, 581 lines) |
+| 2026-08-05 | Session 12 | D3.4 — Radio profiles CRUD (5 REST endpoints, 24 integration tests) |
 
 ---
 
