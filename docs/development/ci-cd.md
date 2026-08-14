@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
       - run: npm ci
       - run: npm run lint
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
       - run: npm ci
       - run: npm run format:check
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node-version: [22]
+        node-version: [20]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -88,7 +88,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
       - run: npm ci
       - run: npm run test:coverage
@@ -104,7 +104,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -143,7 +143,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
 
       - run: npm ci --omit=dev
@@ -195,7 +195,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm audit --audit-level=high
 ```
 
@@ -205,14 +205,14 @@ A `Dockerfile` is maintained for local testing and potential containerized deplo
 
 ```dockerfile
 # Dockerfile
-FROM node:22-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:22-alpine
+FROM node:20-alpine
 WORKDIR /app
 RUN apk add --no-cache sqlite-libs
 COPY --from=builder /app/dist ./dist

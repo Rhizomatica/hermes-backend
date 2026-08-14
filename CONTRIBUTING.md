@@ -10,7 +10,7 @@ Hermes is a project by [Rhizomatica](https://www.rhizomatica.org/) dedicated to 
 
 ### Prerequisites
 
-- **Node.js** ≥ 22 LTS
+- **Node.js** ≥ 20 LTS
 - **npm** ≥ 10
 - **Git**
 

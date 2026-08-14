@@ -70,7 +70,7 @@ See [docs/development/i18n.md](../development/i18n.md) for the full internationa
 
 | Component | Technology | Notes |
 |-----------|------------|-------|
-| Runtime | Node.js 22 LTS | Single process, `--max-old-space-size=384` |
+| Runtime | Node.js 20 LTS | Single process, `--max-old-space-size=384` |
 | Language | TypeScript 5.x (strict) | |
 | HTTP Framework | Fastify v5 | |
 | Validation | JSON Schema (AJV) at request boundary | |
@@ -109,7 +109,7 @@ See [docs/development/i18n.md](../development/i18n.md) for the full internationa
 
 ### Runtime Decision
 
-Node.js 22 LTS with TypeScript was chosen over Go and Python because:
+Node.js 20 LTS with TypeScript was chosen over Go and Python because:
 
 - Shared language with the Web UI frontend
 - Faster development velocity

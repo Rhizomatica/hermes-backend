@@ -20,7 +20,7 @@ You are building **Hermes Backend** — a Node.js/TypeScript backend for HF radi
 
 | Component | Technology |
 |-----------|------------|
-| Runtime | Node.js 22 LTS |
+| Runtime | Node.js 20 LTS |
 | Language | TypeScript 5.x (strict mode) |
 | HTTP Framework | Fastify v5 |
 | ORM | Drizzle ORM (SQLite adapter) |
