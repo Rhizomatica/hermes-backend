@@ -10,7 +10,7 @@
 |-------|-------|
 | **Phase** | 3 — HAL & Radio Integration |
 | **Branch** | `feat/phase-3-hal-radio` |
-| **Last Commit** | `1e3adec` — feat(radio): add radio profiles CRUD endpoints with 24 integration tests (D3.4) |
+| **Last Commit** | `eedcf1c` — chore(node): target Node.js 20.19 (Debian 13 Trixie) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -151,6 +151,7 @@
 - `npm run db:migrate` applies all 4 migrations successfully (4 fresh DB cycles verified). `npm run db:generate` still fails on ESM/CJS resolution for schema files.
 - Seed user migrated from custom script to `0003_seed_admin_user.sql` migration file with precomputed bcrypt hash.
 - GitHub push failed (no credentials). PR must be created manually.
+- Node.js target changed from 22 → 20.19 (Debian 13 Trixie): `.nvmrc`, `.node-version`, and `package.json` `engines` + `@types/node` updated.
 - D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains).
 - Architectural review completed (12 findings, 10 addressed, 2 deferred).
 - Phase 0.B is complete with all review fixes applied.
