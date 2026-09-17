@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { SQLiteAdapter } from '../../../src/db/sqlite.adapter.js';
 import { ConversationsRepository } from '../../../src/db/repositories/conversations.repository.js';
-import type { ConversationRow, CreateConversationInput } from '../../../src/db/repositories/conversations.repository.js';
+import type { CreateConversationInput } from '../../../src/db/repositories/conversations.repository.js';
 
 let adapter: SQLiteAdapter;
 let repo: ConversationsRepository;
@@ -209,7 +209,7 @@ describe('ConversationsRepository', () => {
   });
 
   describe('listByParticipant', () => {
-    function addParticipant(conversationId: string, userId: string, role = 'member') {
+    function addParticipant(conversationId: string, userId: string, role = 'member'): void {
       const id = crypto.randomUUID();
       const now = new Date().toISOString();
       adapter.db.run(
@@ -219,7 +219,7 @@ describe('ConversationsRepository', () => {
 
     it('should return conversations where user is a participant (JOIN)', async () => {
       const conv1 = await repo.create(createTestConversation({ createdBy: 'creator-a', title: 'Creator A' }));
-      const conv2 = await repo.create(createTestConversation({ createdBy: 'creator-b', title: 'Creator B' }));
+      await repo.create(createTestConversation({ createdBy: 'creator-b', title: 'Creator B' }));
 
       // User 'participant-x' is a participant in conv1 but NOT the creator
       addParticipant(conv1.id, 'participant-x');

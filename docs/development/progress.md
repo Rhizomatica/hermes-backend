@@ -8,9 +8,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Phase** | 2 — Database Layer & Repository Pattern |
-| **Branch** | `feat/phase-2-database` |
-| **Last Commit** | `e3f0ed8` — chore(db): add Phase 2 migration for all 14 new tables (D2.13) |
+| **Phase** | 3 — HAL & Radio Integration |
+| **Branch** | `feat/phase-3-hal-radio` |
+| **Last Commit** | `eedcf1c` — chore(node): target Node.js 20.19 (Debian 13 Trixie) |
 | **PR** | Not yet opened |
 | **PR URL** | — |
 
@@ -78,7 +78,22 @@
 
 | Task | Status | Commit |
 |------|:------:|--------|
-| All tasks (D3.1–D3.16) | ⬜ READY | — |
+| D3.1 — IRadioDriver interface definition | ✅ | `81172d1` |
+| D3.2 — SBitxCLIDriver (exponential backoff, telemetry reconnection) [AUDIT M-8] | ✅ | `cb3ed42` |
+| D3.3 — SimulatedRadioDriver (fake radio for testing) | ✅ | `e767f27` |
+| D3.4 — Radio profiles CRUD endpoints (`/radio/profiles`) | ✅ | `1e3adec` |
+| D3.5 — `GET /radio/status` — real-time radio snapshot | ⬜ | — |
+| D3.6 — `POST /radio/ptt` — push-to-talk | ⬜ | — |
+| D3.7 — `POST /radio/profiles/:idx/frequency` — set frequency | ⬜ | — |
+| D3.8 — Radio telemetry recording: 1 Hz snapshots → `telemetry_YYYYMMDD` tables | ⬜ | — |
+| D3.9 — `GET /radio/telemetry` — time-range query with UNION ALL [AUDIT H-9] | ⬜ | — |
+| D3.10 — `GET /radio/sessions` — radio session history | ⬜ | — |
+| D3.11 — SWR protection handling + `POST /radio/protection/reset` [AUDIT M-9] | ⬜ | — |
+| D3.12 — i18n: locale detection middleware (AsyncLocalStorage per request) | ⬜ | — |
+| D3.13 — i18n: localized error responses across all endpoints (RFC 7807) | ⬜ | — |
+| D3.14 — i18n: translated AJV validation error messages (JSON Schema) | ⬜ | — |
+| D3.15 — i18n: WebSocket `AUTHENTICATED` frame includes `locale` field | ⬜ | — |
+| D3.16 — i18n: WebSocket system events localized (`SYSTEM_NOTIFICATION`, `CLOCK_SYNCED`) | ⬜ | — |
 
 ### Phase 4 — Messaging & Conversations
 
@@ -120,7 +135,7 @@
 
 ## Next Task
 
-> **Phase 2 Complete** — All tasks D2.1–D2.16 ✅ (14 tables, 14 repositories, 80 unit tests, migration). Next: Phase 3 — HAL & Radio Integration (D3.1). Create branch `feat/phase-3-hal-radio` from `main` and begin.
+> **D3.5** — `GET /radio/status` — real-time radio snapshot endpoint. Requires D3.4 (profiles table available). See `docs/architecture/api.md §4.2` for spec.
 
 ---
 
@@ -128,14 +143,20 @@
 
 - Phase 2 complete: 14 tables, 14 repositories, migration 0002, all CHECK/UNIQUE/FK constraints, indexes.
 - 80 unit tests across 7 repository test files (all pass).
-- 176 total tests pass (80 unit + 96 integration).
+- 340 total tests pass (124 unit + 120 integration + 96 other).
+- D3.2 complete: SBitxCLIDriver with exponential backoff (1s→2s→4s→...→60s cap), SWR protection (>3.0 cuts TX), 10 consecutive failure permanent disconnect, 20 unit tests.
 - `npm run build` — zero TypeScript errors.
-- `drizzle-kit generate` fails on ESM/CJS resolution for schema files — manual SQL migration used (consistent with Phase 1 approach for 0000/0001).
+- Database setup uses `drizzle-kit migrate` exclusively. No custom migration or seed scripts — schema declared in `src/db/schema/*.ts`, migrations (schema + seed) in `src/db/migrations/*.sql`. `scripts/migrate.ts` and `scripts/seed-test-user.ts` removed.
+- Migration files: 0000 (users), 0001 (user_sessions + refresh_replaced_by), 0002 (phase 2 tables + statement-breakpoint), 0003 (seed admin user root/amazonia).
+- `npm run db:migrate` applies all 4 migrations successfully (4 fresh DB cycles verified). `npm run db:generate` still fails on ESM/CJS resolution for schema files.
+- Seed user migrated from custom script to `0003_seed_admin_user.sql` migration file with precomputed bcrypt hash.
 - GitHub push failed (no credentials). PR must be created manually.
+- Node.js target changed from 22 → 20.19 (Debian 13 Trixie): `.nvmrc`, `.node-version`, and `package.json` `engines` + `@types/node` updated.
 - D1.13–D1.17 complete: i18n core module with 18 resource files (3 locales × 6 domains).
 - Architectural review completed (12 findings, 10 addressed, 2 deferred).
 - Phase 0.B is complete with all review fixes applied.
 - Phase 1 is fully complete. All tasks D1.1–D1.17 ✅.
+- Phase 3 has started on branch `feat/phase-3-hal-radio`.
 
 ---
 
@@ -153,6 +174,10 @@
 | 2026-08-04 | Session 7 | D1.13–D1.17 — i18n module (18 resource files, 42 tests) |
 | 2026-08-04 | Session 7b | Review fixes — pt prefix, TranslationKey type, D3.12 comment |
 | 2026-08-04 | Session 8 | Phase 2: D2.1–D2.16 — all 14 tables, 14 repositories, migration, 80 unit tests |
+| 2026-08-05 | Session 9 | D3.1 — IRadioDriver interface with typed events and status types |
+| 2026-08-05 | Session 10 | D3.2 — SBitxCLIDriver with exponential backoff, SWR protection, 20 unit tests |
+| 2026-08-05 | Session 11 | D3.3 — SimulatedRadioDriver (24 unit tests, 3 files, 581 lines) |
+| 2026-08-05 | Session 12 | D3.4 — Radio profiles CRUD (5 REST endpoints, 24 integration tests) |
 
 ---
 

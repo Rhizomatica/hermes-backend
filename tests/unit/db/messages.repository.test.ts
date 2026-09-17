@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createHash } from 'node:crypto';
 import { SQLiteAdapter } from '../../../src/db/sqlite.adapter.js';
 import { MessagesRepository } from '../../../src/db/repositories/messages.repository.js';
-import type { MessageRow, CreateMessageInput } from '../../../src/db/repositories/messages.repository.js';
+import type { CreateMessageInput } from '../../../src/db/repositories/messages.repository.js';
 
 let adapter: SQLiteAdapter;
 let repo: MessagesRepository;

@@ -81,7 +81,7 @@ Full setup guide: [Deployment Guide](docs/operations/deployment.md)
 
 | Layer | Technology |
 |-------|------------|
-| Runtime | Node.js 22 LTS + TypeScript 5.x (strict) |
+| Runtime | Node.js 20 LTS + TypeScript 5.x (strict) |
 | HTTP | Fastify v5 + JSON Schema (AJV) + OpenAPI 3.1 |
 | Database | SQLite 3.45+ (WAL mode) + Drizzle ORM |
 | Event Bus | In-process EventEmitter (typed) |

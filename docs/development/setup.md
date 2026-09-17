@@ -4,8 +4,8 @@
 
 | Tool | Minimum Version | Notes |
 |------|:---:|-------|
-| Node.js | 22 LTS | Required for ESM, `node:test` runner compatibility |
-| npm | 10+ | Ships with Node.js 22 |
+| Node.js | 20 LTS (20.19) | Required for ESM, `node:test` runner compatibility; matches Debian 13 Trixie |
+| npm | 10+ | Ships with Node.js 20 |
 | Git | 2.40+ | |
 | SQLite | 3.45+ | For WAL mode support; ships with most Linux distros |
 
