@@ -1,42 +1,28 @@
-# Dependencies
-node_modules/
-
 # Build output
-dist/
+/bin/
 
-# Environment files
+# Test artifacts
+coverage.out
+*.test
+
+# Environment
 .env
 .env.local
-.env.*.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Testing
-coverage/
 
 # Database
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
-data/
+/data/
 
 # Logs
-logs/
 *.log
+/logs/
 
-# Drizzle
-drizzle/meta/
-
-# Temporary files
-tmp/
-temp/
-keys/private.pem
-keys/public.pem
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
