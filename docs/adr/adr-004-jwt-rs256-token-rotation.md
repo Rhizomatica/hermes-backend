@@ -150,6 +150,15 @@ CREATE INDEX idx_sessions_expires ON user_sessions(expires_at);
 
 ### RBAC Claims in JWT
 
+> **Correction (September 2026) — this section did not match the implementation.** The claims shown below (`permissions`, `station`) are **not issued**, and two claims that *are* issued (`callsign`, `locale`) were missing. `src/auth/token.ts` defines the real contract:
+>
+> | Token | Claims actually issued (`TokenPayload` / `RefreshTokenPayload`) |
+> |---|---|
+> | Access | `sub`, `callsign`, `role`, `locale`, `iss`, `iat`, `exp` |
+> | Refresh | `sub`, `type`, `jti`, `iss`, `iat`, `exp` |
+>
+> `locale` is load-bearing — it is how a client learns the user's language without a second request. The decision in this ADR (RS256, rotation, reuse detection) is unchanged; only the documented claim set was wrong. Found during the Go port's re-validation (`go-migration.md` §R-6.1), where a port written against this section would have produced tokens the current UI cannot read.
+
 ```json
 {
   "sub": "user-uuid-123",

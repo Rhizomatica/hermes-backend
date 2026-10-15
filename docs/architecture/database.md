@@ -93,6 +93,8 @@ The adapter is selected at startup via the `DB_ADAPTER` environment variable (de
 
 ## 3. Entity Relationship Diagram
 
+> **See also**: [Entity-Relationship Diagram](erd.md) — the same model with the complete column list, nullability, unique constraints and all 23 foreign keys, verified against a migrated database.
+
 ```mermaid
 erDiagram
 	direction TB
@@ -103,21 +105,23 @@ erDiagram
 	users||--o{messages:"sends"
 	users||--o{message_deliveries:"receives"
 	users||--o{message_reactions:"reacts"
-	users||--o{audit_logs:"performs"
+	users|o--o{audit_logs:"performs"
 	users||--o{radio_profiles:"configures"
-	users||--o{connection_schedules:"creates"
+	users|o--o{connection_schedules:"creates"
 	users||--o{attachments:"uploads"
+	users||--o{conversations:"creates"
+	users||--o{radio_sessions:"runs"
 	conversations||--o{conversation_participants:"contains"
 	conversations||--o{messages:"contains"
-	conversations||--o{attachments:"contains"
+	conversations|o--o{attachments:"contains"
 	messages||--o{message_deliveries:"delivery"
 	messages||--o{message_reactions:"reactions"
-	messages||--o{attachments:"attachments"
-	messages||--||message_envelopes:"envelope"
-	messages||--o|messages:"replies_to"
-	messages||--o|messages:"forwarded_from"
-	radio_profiles||--o{radio_sessions:"used_by"
-	frequencies||--o{connection_schedules:"scheduled"
+	messages|o--o{attachments:"attachments"
+	messages||--o|message_envelopes:"envelope"
+	messages|o--o{messages:"replies_to"
+	messages|o--o{messages:"forwarded_from"
+	radio_profiles|o--o{radio_sessions:"used_in"
+	frequencies|o--o{connection_schedules:"scheduled"
 
     users {
         text id PK "UUID"
@@ -168,7 +172,7 @@ erDiagram
         text sender_id FK
         text client_message_id UK "Idempotency"
         text content "max 64KB"
-        text content_type "text|markdown|html|audio|system"
+        text content_type "text|markdown|html|audio|system|attachment_only"
         text reply_to_message_id FK
         text status "draft|sending|sent|failed"
         text deleted_at "soft delete"
@@ -277,6 +281,8 @@ erDiagram
 ```
 
 > **Note**: Tables `radio_telemetry_YYYYMMDD` (in `telemetry.db`) and `gps_YYYYMMDD` (in `gps.db`) are daily-sharded time-series tables managed by the application layer, not shown in the ER diagram. See §4.5 and §4.7 for their schemas.
+>
+> **Implementation status**: neither sharded table exists yet — there is no migration, no Drizzle table and no repository for them in `src/`. They are planned work (see [Go Migration Guide](../development/go-migration.md), Wave 5).
 
 ### Relationship Summary
 
@@ -284,10 +290,12 @@ erDiagram
 |--------|-------|------|-----------|
 | `users` | `user_sessions` | 1:∞ | CASCADE |
 | `users` | `user_devices` | 1:∞ | CASCADE |
+| `users` | `conversations` (creator) | 1:∞ | RESTRICT |
 | `users` | `conversation_participants` | 1:∞ | CASCADE |
 | `users` | `messages` (sender) | 1:∞ | RESTRICT |
 | `users` | `message_deliveries` (recipient) | 1:∞ | CASCADE |
 | `users` | `message_reactions` | 1:∞ | CASCADE |
+| `users` | `attachments` (uploader) | 1:∞ | RESTRICT |
 | `users` | `radio_profiles` | 1:∞ | CASCADE |
 | `users` | `radio_sessions` | 1:∞ | CASCADE |
 | `users` | `connection_schedules` (creator) | 1:∞ | SET NULL |

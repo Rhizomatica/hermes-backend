@@ -69,9 +69,9 @@ Full setup guide: [Deployment Guide](docs/operations/deployment.md)
 
 | Category | Documents |
 |----------|-----------|
-| **Specs** | [REST API](docs/architecture/api.md) · [Database Schema](docs/architecture/database.md) · [WebSocket Protocol](docs/architecture/websocket.md) · [Hardware Integration](docs/architecture/hardware-integration.md) |
-| **Decisions** | [ADR-001: SQLite](docs/adr/adr-001-sqlite-for-pi4.md) · [ADR-002: Event Bus](docs/adr/adr-002-in-process-event-bus.md) · [ADR-003: Messaging](docs/adr/adr-003-conversation-messaging-model.md) · [ADR-004: JWT](docs/adr/adr-004-jwt-rs256-token-rotation.md) |
-| **Development** | [Plan](docs/development/plan.md) · [Setup](docs/development/setup.md) · [Testing](docs/development/testing.md) · [CI/CD](docs/development/ci-cd.md) · [i18n](docs/development/i18n.md) |
+| **Specs** | [REST API](docs/architecture/api.md) · [Database Schema](docs/architecture/database.md) · [ER Diagram](docs/architecture/erd.md) · [WebSocket Protocol](docs/architecture/websocket.md) · [Hardware Integration](docs/architecture/hardware-integration.md) |
+| **Decisions** | [ADR-001: SQLite](docs/adr/adr-001-sqlite-for-pi4.md) · [ADR-002: Event Bus](docs/adr/adr-002-in-process-event-bus.md) · [ADR-003: Messaging](docs/adr/adr-003-conversation-messaging-model.md) · [ADR-004: JWT](docs/adr/adr-004-jwt-rs256-token-rotation.md) · [ADR-005: Conflict Resolution](docs/adr/adr-005-conflict-resolution-strategy.md) · [ADR-006: Go Rewrite](docs/adr/adr-006-go-rewrite-and-station-consolidation.md) |
+| **Development** | [Plan](docs/development/plan.md) · [Setup](docs/development/setup.md) · [Testing](docs/development/testing.md) · [CI/CD](docs/development/ci-cd.md) · [i18n](docs/development/i18n.md) · [Go Migration](docs/development/go-migration.md) |
 | **Operations** | [Deployment](docs/operations/deployment.md) · [Security](docs/operations/security.md) · [Observability](docs/operations/observability.md) |
 | **Audits** | [sBitx v2 Hardware Audit](docs/audits/sbitx-v2.md) · [Comprehensive Architecture Audit](docs/audits/comprehensive.md) |
 

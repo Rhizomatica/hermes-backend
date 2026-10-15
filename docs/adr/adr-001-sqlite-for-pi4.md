@@ -6,6 +6,8 @@
 
 Supersedes the original ADR-002 from [hermes-backend](https://github.com/Rhizomatica/hermes-backend) which selected PostgreSQL for server deployments.
 
+**Go port note (September 2026):** [ADR-006](adr-006-go-rewrite-and-station-consolidation.md) re-expresses this decision for a Go implementation. The single-writer guarantee relied on in footnote ¹ is no longer provided by the Node.js event loop; it must be enforced by a dedicated single write connection — see [go-migration.md §R-1](../development/go-migration.md).
+
 ## Context
 
 The hermes-backend targets the **sBitx v2** hardware platform — a Raspberry Pi 4 with 4 GB RAM running a single HF radio transceiver. The original hermes-backend architecture chose PostgreSQL 17 for concurrent writes, JSONB indexing, full-text search, TimescaleDB time-series, and row-level security. These are correct for a **multi-station server deployment** but not for a **single-station field device**.
@@ -98,8 +100,8 @@ class PostgresAdapter implements DatabaseAdapter { /* Future — same interface 
 The adapter is selected at startup via environment variable:
 
 ```bash
-DATABASE_ADAPTER=sqlite     # Default for sBitx v2
-# DATABASE_ADAPTER=postgres  # Future server deployments
+DB_ADAPTER=sqlite     # Default for sBitx v2
+# DB_ADAPTER=postgres  # Future server deployments
 ```
 
 ## Alternatives Considered
