@@ -65,6 +65,7 @@ hermes-backend/
 │   ├── api.md                    # REST API specification
 │   ├── architecture/api.md
 │   ├── architecture/database.md
+│   ├── architecture/erd.md
 │   ├── architecture/websocket.md
 │   ├── architecture/hardware-integration.md
 │   ├── audits/sbitx-v2.md

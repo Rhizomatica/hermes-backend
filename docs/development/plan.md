@@ -4,6 +4,8 @@ Based on the current documentation structure and the sBitx v2 constraints, here'
 
 > **Audit traceability**: Tasks marked with `[AUDIT X-N]` address findings from `docs/audits/comprehensive.md`. See `docs/development/plan-review.md` for the full mapping.
 
+> **Go migration**: [ADR-006](../adr/adr-006-go-rewrite-and-station-consolidation.md) proposes rewriting the backend in Go and consolidating the backend, Mercury, and the radio daemon into a single linked process. The spike and port task list is in [`go-migration.md`](go-migration.md). The phase plan below describes the **Node.js/TypeScript** implementation and remains the behavioral specification the Go port must satisfy.
+
 ---
 
 ## Phase 0: Documentation & Tooling Setup (Current)

@@ -4,6 +4,8 @@
 
 **Accepted** (July 2026)
 
+**Go port note (September 2026):** [ADR-006](adr-006-go-rewrite-and-station-consolidation.md) re-expresses this decision for a Go implementation. `EventEmitter`'s synchronous, exception-isolating delivery is not a property of Go channels; the delivery model must be specified explicitly — see [go-migration.md §R-2](../development/go-migration.md).
+
 ## Context
 
 The original hermes-backend architecture used **Redis Pub/Sub** as the internal event bus for decoupling modules and powering the WebSocket realtime gateway. This pattern is well-established for multi-process, multi-node deployments.

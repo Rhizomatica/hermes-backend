@@ -4,6 +4,8 @@
 
 **Accepted** (July 2026)
 
+**Go port note (September 2026):** [ADR-006](adr-006-go-rewrite-and-station-consolidation.md) re-expresses this decision for a Go implementation. The serialization assumption this ADR depends on ("the event loop serializes writes") is no longer automatic; it becomes an explicit single-writer-connection guarantee. Without it, "last writer wins" is nondeterministic — see [go-migration.md §R-1](../development/go-migration.md).
+
 ## Context
 
 The hermes-backend runs on a **Raspberry Pi 4** accessed via local WiFi hotspot. Clients (browser on phone/laptop) connect to the Pi directly. All data lives in SQLite on the Pi — the server is the **single source of truth**. There is no offline sync protocol or multi-device replication.
@@ -145,7 +147,7 @@ When the system evolves to support multiple stations synchronizing over HF radio
 - **CRDT-based approach** (e.g., Y.js or Automerge for text, Observed-Remove Set for reactions) should be evaluated.
 - **Lamport timestamps or hybrid logical clocks** replace `updated_at` as tiebreakers when clocks may be unsynchronized across stations.
 
-This ADR explicitly limits its scope to the single-station deployment model. An ADR-006 should supersede it when federation begins.
+This ADR explicitly limits its scope to the single-station deployment model. An ADR-007 should supersede it when federation begins (ADR-006 covers the Go rewrite and single-process station consolidation).
 
 ## Alternatives Considered
 
