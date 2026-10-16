@@ -8,7 +8,7 @@ the wire contract; the prose documents explain intent and implementation.
 
 | Area | Files | Status |
 |------|-------|:------:|
-| Decisions | [`adr/`](adr/) — decision register + ADRs | register ✅ · ADRs in progress |
+| Decisions | [`adr/`](adr/) — decision register + ADRs | register ✅ · ADR-001 ✅ · ADR-002 ✅ |
 | Contracts | [`../api/contracts/api-rest.yaml`](../api/contracts/api-rest.yaml) · [`../api/contracts/api-ws.yaml`](../api/contracts/api-ws.yaml) | ✅ vendored |
 | Development | [`development/plan.md`](development/plan.md) | ✅ |
 | Architecture | `architecture/overview.md`, `api.md`, `websocket.md`, `database.md`, `auth.md`, `radio-integration.md`, `messaging.md` | planned |

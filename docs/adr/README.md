@@ -8,29 +8,28 @@ The Node.js/TypeScript backend and its ADRs are preserved for consultation in:
 - tag `legacy-nodejs-20261015`
 - local folder `hermes-backend-backup/`
 
-This register reconciles the two documents that previously described the system
-(`hermes-documentation/tech_docs/api-redesign/README.md` vs `hermes-backend/`,
-see `COMPARISON.md`) into **one** target.
+**Governing rule:** where the source documents differ, Rafael's design is
+authoritative — `hermes-documentation/tech_docs/api-redesign/{README.md,
+api-rest.yaml, api-ws.yaml, broadcast.md}`. The `hermes-backend/` doc set is a
+source of ideas, not a competing contract.
 
-## Locked decisions
+## ADRs
 
-| # | Decision | Choice | Notes |
-|---|----------|--------|-------|
-| ADR-001 | Language / runtime | **Go**, single binary | Replaces Node.js (V8 ~150–600 MB RSS) |
-| ADR-002 | Database | **SQLite (WAL)** via `modernc.org/sqlite` | Zero daemon, ~2–5 MB, backup = file copy |
-| ADR-003 | REST contract | `api-rest.yaml` → **`/api/v2`, snake_case, RFC 9457** | Maintainer's authoritative spec |
-| ADR-004 | WebSocket | `api-ws.yaml` → **`hermes.v1`** at `/api/v2/ws` | Maintainer's authoritative spec |
-| ADR-005 | Auth | **Opaque session tokens (hashed) + argon2id** | Replaces JWT RS256 (legacy ADR-004) |
-| ADR-006 | Roles | `readonly` < `user` < `operator` < `admin` | Spec's `x-hermes-role` |
-| ADR-007 | Topology | One process serves REST+WS; radiod/Mercury behind HAL, **cgo consolidation later** | Phased per legacy ADR-006 spikes S1/S2 |
-| ADR-008 | Broadcast | NNCP area broadcast plane, RaptorQ carousel | Decided by Rafael, 2026-10-12 |
+| # | File | Decision | Status |
+|---|------|----------|:------:|
+| ADR-001 | [adr-001-go-runtime-single-process.md](adr-001-go-runtime-single-process.md) | Go, single binary, one process serves REST+WS; radio/modem via HAL → cgo later | ✅ written |
+| ADR-002 | [adr-002-session-token-auth.md](adr-002-session-token-auth.md) | Opaque session tokens (hashed) + argon2id + 4-role RBAC | ✅ written |
+| ADR-003 | (planned) | REST `/api/v2` contract — adopts `api-rest.yaml` | pending |
+| ADR-004 | (planned) | WebSocket `hermes.v1` — adopts `api-ws.yaml` | pending |
+| ADR-005 | (planned) | Broadcast = NNCP area plane, RaptorQ carousel | pending |
 
 ## Open decisions (block schema freeze)
 
-| # | Decision | Proposed default | Owner |
-|---|----------|------------------|-------|
-| O-01 | Messaging model: per-recipient delivery vs chat-native conversations | Per-recipient delivery (`inbox/outbox/drafts` + delivery state), matching deployed `.hmp` | Product + Backend |
-| O-02 | Radio config source of truth | DB desired-config + daemon runtime state reconciled on boot | Radio + Backend |
-| O-03 | Roles for existing users at upgrade | Everyone except `root` starts as `user` | Product |
-| O-04 | `nncp-transport` branch fate | Merge before the migration step | Maintainer |
-| O-05 | Local-only chat (delivery `channel=websocket`) | Allow; same-station users bypass HF | Product + Backend |
+| # | Decision | Rafael's position | Owner |
+|---|----------|-------------------|-------|
+| O-01 | Messaging model | inbox/outbox/drafts + per-recipient delivery (not chat-native) | Product + Backend |
+| O-02 | Database engine | MariaDB (deployed default); SQLite open (D-01) | Backend |
+| O-03 | Radio config source of truth | DB desired-config + daemon runtime reconciled on boot | Radio + Backend |
+| O-04 | Roles for existing users at upgrade | everyone except `root` starts as `user` | Product |
+| O-05 | `nncp-transport` branch fate | merge before migration | Maintainer |
+| O-06 | Local-only chat (`channel=websocket`) | open | Product + Backend |
